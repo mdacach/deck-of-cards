@@ -1,25 +1,24 @@
-package card_test
+package card
 
 import (
-	"deck_of_cards/card"
 	"testing"
 )
 
 func TestCardString(t *testing.T) {
 	cases := []struct {
-		card     card.Card
+		card     Card
 		expected string
 	}{
-		{card: card.Card{Suit: card.Spades, Rank: card.Ace}, expected: "AS"},
-		{card: card.Card{Suit: card.Hearts, Rank: card.Ten}, expected: "10H"},
-		{card: card.Card{Suit: card.Diamonds, Rank: card.Queen}, expected: "QD"},
-		{card: card.Card{Suit: card.Clubs, Rank: card.Jack}, expected: "JC"},
+		{card: Card{Suit: Spades, Rank: Ace}, expected: "AS"},
+		{card: Card{Suit: Hearts, Rank: Ten}, expected: "10H"},
+		{card: Card{Suit: Diamonds, Rank: Queen}, expected: "QD"},
+		{card: Card{Suit: Clubs, Rank: Jack}, expected: "JC"},
 	}
 
-	for _, c := range cases {
-		code := c.card.String()
-		if code != c.expected {
-			t.Errorf("Expected card code %q, but got %q", c.expected, code)
+	for _, test := range cases {
+		code := test.card.String()
+		if code != test.expected {
+			t.Errorf("Expected   code %q, but got %q", test.expected, code)
 		}
 	}
 }
