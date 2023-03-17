@@ -71,3 +71,23 @@ func (d *Deck) Shuffle() {
 		d.Cards[i], d.Cards[j] = d.Cards[j], d.Cards[i]
 	})
 }
+
+func (d *Deck) Draw(count int) ([]card.Card, error) {
+	if count > d.Remaining {
+		return nil, fmt.Errorf("not enough cards remaining in the deck")
+	}
+
+	// We copy all drawn cards at once to avoid reallocating the array multiple times.
+	drawnCards := make([]card.Card, count)
+	copy(drawnCards, d.Cards[:count]) // We don't want to mutate d.Cards from drawnCards.
+
+	// TODO: Write about this.
+	//       Here it's not a very big deal to keep resizing the array (because it's small, at most 52 items)
+	//       But in another context, we could think about optimizing this: for example, we can keep the array
+	//       the same, and keep track of how many cards we have removed until now. Then the "first" card of the
+	//       array will actually be at the index `cardsRemoved`.
+	d.Cards = d.Cards[count:]
+	d.Remaining -= count
+
+	return drawnCards, nil
+}

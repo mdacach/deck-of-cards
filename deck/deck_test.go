@@ -149,3 +149,51 @@ func TestShuffle(t *testing.T) {
 		})
 	}
 }
+
+func TestDeckDraw(t *testing.T) {
+	testCases := []struct {
+		name          string
+		drawCount     int
+		expectedErr   bool
+		expectedCards int
+	}{
+		{
+			name:          "draw one card",
+			drawCount:     1,
+			expectedErr:   false,
+			expectedCards: 1,
+		},
+		{
+			name:          "draw five cards",
+			drawCount:     5,
+			expectedErr:   false,
+			expectedCards: 5,
+		},
+		{
+			name:          "draw exactly the remaining cards",
+			drawCount:     52,
+			expectedErr:   false,
+			expectedCards: 52,
+		},
+		{
+			name:        "draw more cards than remaining",
+			drawCount:   60,
+			expectedErr: true,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			deck := NewStandardDeck()
+
+			cards, err := deck.Draw(tc.drawCount)
+
+			if tc.expectedErr {
+				require.Error(t, err)
+			} else {
+				require.NoError(t, err)
+				require.Len(t, cards, tc.expectedCards)
+			}
+		})
+	}
+}
