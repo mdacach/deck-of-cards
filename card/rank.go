@@ -17,7 +17,7 @@ const (
 	Seven Rank = "7"
 	Eight Rank = "8"
 	Nine  Rank = "9"
-	Ten   Rank = "10"
+	Ten   Rank = "10" // TODO: Consider changing this to "T"
 	Jack  Rank = "J"
 	Queen Rank = "Q"
 	King  Rank = "K"
