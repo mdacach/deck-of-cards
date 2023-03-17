@@ -3,6 +3,7 @@ package deck
 import (
 	"deck_of_cards/card"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"testing"
 )
 
@@ -41,5 +42,34 @@ func TestNewPartialDeckCards(t *testing.T) {
 	// The cards we passed by code are the deck's cards.
 	for i, code := range codes {
 		assert.Equal(t, code, deck.Cards[i].String(), "Deck card should match the specified code")
+	}
+}
+
+func TestNewPartialDeckValid(t *testing.T) {
+	testCases := []struct {
+		name        string
+		cardStrings []string
+		wantDeckLen int
+	}{
+		{
+			name:        "single valid card",
+			cardStrings: []string{"AS"},
+			wantDeckLen: 1,
+		},
+		{
+			name:        "multiple valid cards - no repeated",
+			cardStrings: []string{"AS", "KD", "AC", "2C", "KH"},
+			wantDeckLen: 5,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			deck, err := NewPartialDeck(tc.cardStrings)
+			// If there is an error, we do not want to continue with the execution.
+			require.NoError(t, err, "Unexpected error in NewPartialDeck: %v", err)
+			assert.Equal(t, tc.wantDeckLen, len(deck.Cards), "Expected deck length to be: %v but got: %v", tc.wantDeckLen, len(deck.Cards))
+			assert.Equal(t, tc.wantDeckLen, deck.Remaining, "Expected deck remaining cards to be: %v but got: %v", tc.wantDeckLen, deck.Remaining)
+		})
 	}
 }
