@@ -6,8 +6,9 @@ import (
 )
 
 type Deck struct {
-	ID    uuid.UUID
-	Cards []card.Card
+	ID        uuid.UUID
+	Cards     []card.Card
+	Remaining int
 }
 
 func NewStandardDeck() Deck {
@@ -20,7 +21,8 @@ func NewStandardDeck() Deck {
 	}
 
 	return Deck{
-		ID:    uuid.New(),
-		Cards: cards,
+		ID:        uuid.New(),
+		Cards:     cards,
+		Remaining: len(cards),
 	}
 }

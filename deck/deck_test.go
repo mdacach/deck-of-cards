@@ -11,6 +11,7 @@ func TestNewStandardDeck(t *testing.T) {
 
 	assert.NotNil(t, deck.ID, "Deck ID should not be nil")
 	assert.Len(t, deck.Cards, 52, "A standard deck should have 52 cards")
+	assert.Equal(t, deck.Remaining, len(deck.Cards), "A standard deck should start with 52 cards remaining")
 
 	cardCount := make(map[card.Card]int)
 
