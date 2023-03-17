@@ -8,3 +8,21 @@ const (
 	Clubs    Suit = "C"
 	Hearts   Suit = "H"
 )
+
+func (s Suit) LongString() string {
+	switch s {
+	case Spades:
+		return "SPADES"
+	case Diamonds:
+		return "DIAMONDS"
+	case Clubs:
+		return "CLUBS"
+	case Hearts:
+		return "HEARTS"
+	default:
+		// TODO: Should we return an error instead?
+		//       In Rust I would return a Result here, but maybe considering the empty string
+		//       as an error in Go is simpler and accomplishes the same as an err variable.
+		return ""
+	}
+}
