@@ -1,5 +1,10 @@
 package card
 
+import (
+	"fmt"
+	"strings"
+)
+
 type Rank string
 
 const (
@@ -51,5 +56,38 @@ func (r Rank) LongString() string {
 		//       In Rust I would return a Result here, but maybe considering the empty string
 		//       as an error in Go is simpler and accomplishes the same as an err variable.
 		return ""
+	}
+}
+
+func ParseLongRank(r string) (Rank, error) {
+	switch strings.ToUpper(r) {
+	case "ACE":
+		return Ace, nil
+	case "TWO":
+		return Two, nil
+	case "THREE":
+		return Three, nil
+	case "FOUR":
+		return Four, nil
+	case "FIVE":
+		return Five, nil
+	case "SIX":
+		return Six, nil
+	case "SEVEN":
+		return Seven, nil
+	case "EIGHT":
+		return Eight, nil
+	case "NINE":
+		return Nine, nil
+	case "TEN":
+		return Ten, nil
+	case "JACK":
+		return Jack, nil
+	case "QUEEN":
+		return Queen, nil
+	case "KING":
+		return King, nil
+	default:
+		return "", fmt.Errorf("could not parse Rank from string: %s", r)
 	}
 }
