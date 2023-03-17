@@ -14,6 +14,10 @@ const (
 	Hearts   Suit = "H"
 )
 
+func Suits() []Suit {
+	return []Suit{Spades, Diamonds, Clubs, Hearts}
+}
+
 func (s Suit) LongString() string {
 	switch s {
 	case Spades:

@@ -23,6 +23,10 @@ const (
 	King  Rank = "K"
 )
 
+func Ranks() []Rank {
+	return []Rank{Ace, Two, Three, Four, Five, Six, Seven, Eight, Nine, Ten, Jack, Queen, King}
+}
+
 func (r Rank) LongString() string {
 	switch r {
 	case Ace:
