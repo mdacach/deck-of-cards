@@ -2,6 +2,7 @@ package card
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 )
 
@@ -9,6 +10,49 @@ import (
 type Card struct {
 	Rank Rank
 	Suit Suit
+}
+
+func FromString(s string) (Card, error) {
+	// All codes have at least two characters (one for Rank, one for Suit).
+	if len(s) < 2 {
+		return Card{}, errors.New("invalid card string")
+	}
+
+	// The suit should come always last, and have always length one.
+	// So we can split the string into the rank and suit portions accordingly.
+	rankStr := s[:len(s)-1]
+	suitStr := s[len(s)-1:]
+
+	// Up until here, we do not know if the rank and suit are valid strings.
+	// So we need to validate them.
+	// TODO: This validation will move to Rank and Suit.
+
+	isValidRank := false
+	for _, r := range Ranks() {
+		if string(r) == rankStr {
+			isValidRank = true
+			break
+		}
+	}
+	if !isValidRank {
+		return Card{}, fmt.Errorf("invalid rank string: %s", rankStr)
+	}
+	rank := Rank(rankStr)
+
+	isValidSuit := false
+	for _, s := range Suits() {
+		if string(s) == suitStr {
+			isValidSuit = true
+			break
+		}
+	}
+	if !isValidSuit {
+		return Card{}, fmt.Errorf("invalid suit string: %s", suitStr)
+	}
+	suit := Suit(suitStr)
+
+	// As rank and suit were validated, we can create the Card directly with them.
+	return Card{Rank: rank, Suit: suit}, nil
 }
 
 func (c Card) MarshalJSON() ([]byte, error) {
