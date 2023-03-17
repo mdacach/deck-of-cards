@@ -1,1 +1,26 @@
 package deck
+
+import (
+	"deck_of_cards/card"
+	"github.com/google/uuid"
+)
+
+type Deck struct {
+	ID    uuid.UUID
+	Cards []card.Card
+}
+
+func NewStandardDeck() Deck {
+	cards := make([]card.Card, 0, 52)
+
+	for _, s := range card.Suits() {
+		for _, r := range card.Ranks() {
+			cards = append(cards, card.Card{Rank: r, Suit: s})
+		}
+	}
+
+	return Deck{
+		ID:    uuid.New(),
+		Cards: cards,
+	}
+}
