@@ -27,6 +27,16 @@ func Ranks() []Rank {
 	return []Rank{Ace, Two, Three, Four, Five, Six, Seven, Eight, Nine, Ten, Jack, Queen, King}
 }
 
+// TODO: This will be refactored. The validation will happen in the Rank constructor.
+func (r Rank) IsValid() bool {
+	for _, validRank := range Ranks() {
+		if r == validRank {
+			return true
+		}
+	}
+	return false
+}
+
 func (r Rank) LongString() string {
 	switch r {
 	case Ace:

@@ -18,6 +18,16 @@ func Suits() []Suit {
 	return []Suit{Spades, Diamonds, Clubs, Hearts}
 }
 
+// TODO: This will be refactored. The validation will happen in the Rank constructor.
+func (s Suit) IsValid() bool {
+	for _, validSuit := range Suits() {
+		if s == validSuit {
+			return true
+		}
+	}
+	return false
+}
+
 func (s Suit) LongString() string {
 	switch s {
 	case Spades:

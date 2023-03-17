@@ -25,33 +25,18 @@ func FromString(s string) (Card, error) {
 
 	// Up until here, we do not know if the rank and suit are valid strings.
 	// So we need to validate them.
-	// TODO: This validation will move to Rank and Suit.
-
-	isValidRank := false
-	for _, r := range Ranks() {
-		if string(r) == rankStr {
-			isValidRank = true
-			break
-		}
-	}
-	if !isValidRank {
-		return Card{}, fmt.Errorf("invalid rank string: %s", rankStr)
-	}
+	// TODO: This will change.
 	rank := Rank(rankStr)
-
-	isValidSuit := false
-	for _, s := range Suits() {
-		if string(s) == suitStr {
-			isValidSuit = true
-			break
-		}
-	}
-	if !isValidSuit {
-		return Card{}, fmt.Errorf("invalid suit string: %s", suitStr)
-	}
 	suit := Suit(suitStr)
 
-	// As rank and suit were validated, we can create the Card directly with them.
+	if !rank.IsValid() {
+		return Card{}, fmt.Errorf("invalid rank string: %s", rankStr)
+	}
+
+	if !suit.IsValid() {
+		return Card{}, fmt.Errorf("invalid suit string: %s", suitStr)
+	}
+
 	return Card{Rank: rank, Suit: suit}, nil
 }
 
