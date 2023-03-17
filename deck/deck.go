@@ -2,6 +2,7 @@ package deck
 
 import (
 	"deck_of_cards/card"
+	"errors"
 	"fmt"
 	"github.com/google/uuid"
 )
@@ -28,9 +29,11 @@ func NewStandardDeck() Deck {
 	}
 }
 
-// deck.go
-
 func NewPartialDeck(codes []string) (Deck, error) {
+	if len(codes) == 0 {
+		return Deck{}, errors.New("a deck must have at least one card")
+	}
+
 	cards := make([]card.Card, 0, len(codes))
 
 	for _, code := range codes {

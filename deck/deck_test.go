@@ -73,3 +73,42 @@ func TestNewPartialDeckValid(t *testing.T) {
 		})
 	}
 }
+
+func TestNewPartialDeckInvalidScenarios(t *testing.T) {
+	testCases := []struct {
+		name        string
+		cardStrings []string
+	}{
+		{
+			name:        "empty deck",
+			cardStrings: []string{},
+		},
+		{
+			name:        "single invalid codes",
+			cardStrings: []string{"ZD"},
+		},
+		{
+			name:        "invalid card code",
+			cardStrings: []string{"AS", "ZD", "AC", "2C", "KH"},
+		},
+		{
+			name:        "multiple invalid card codes",
+			cardStrings: []string{"AS", "ZD", "AC", "ZZ", "2C", "KH"},
+		},
+		{
+			name:        "only invalid codes",
+			cardStrings: []string{"AA", "BB", "33"},
+		},
+		{
+			name:        "invalid utf8 code",
+			cardStrings: []string{"AS", "😀D", "AC", "2C", "KH"},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			_, err := NewPartialDeck(tc.cardStrings)
+			require.Error(t, err, "expected an error for %s", tc.name)
+		})
+	}
+}
