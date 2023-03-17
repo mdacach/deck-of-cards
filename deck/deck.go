@@ -2,6 +2,7 @@ package deck
 
 import (
 	"deck_of_cards/card"
+	"fmt"
 	"github.com/google/uuid"
 )
 
@@ -25,4 +26,24 @@ func NewStandardDeck() Deck {
 		Cards:     cards,
 		Remaining: len(cards),
 	}
+}
+
+// deck.go
+
+func NewPartialDeck(codes []string) (Deck, error) {
+	cards := make([]card.Card, 0, len(codes))
+
+	for _, code := range codes {
+		c, err := card.FromString(code)
+		if err != nil {
+			return Deck{}, fmt.Errorf("invalid card code '%s': %w", code, err)
+		}
+		cards = append(cards, c)
+	}
+
+	return Deck{
+		ID:        uuid.New(),
+		Cards:     cards,
+		Remaining: len(cards),
+	}, nil
 }
