@@ -116,3 +116,36 @@ func TestNewPartialDeckInvalidScenarios(t *testing.T) {
 		})
 	}
 }
+
+func TestShuffle(t *testing.T) {
+	createPartialDeck := func() Deck { d, _ := NewPartialDeck([]string{"AS", "KD", "AC", "2C", "KH"}); return d }
+	testCases := []struct {
+		name       string
+		createDeck func() Deck
+	}{
+		{
+			name:       "full deck",
+			createDeck: NewStandardDeck,
+		},
+		{
+			name:       "partial deck",
+			createDeck: createPartialDeck,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			d := tc.createDeck()
+
+			originalCards := make([]card.Card, len(d.Cards))
+			copy(originalCards, d.Cards)
+
+			d.Shuffle()
+
+			assert.Equal(t, len(originalCards), len(d.Cards), "the number of cards should remain the same after shuffling")
+			// There is a *very* small probability of this test failing (the shuffle may end up with the cards in the same place).
+			// Sorry if that happens to you...
+			assert.NotEqual(t, originalCards, d.Cards, "the order of cards should change after shuffling")
+		})
+	}
+}

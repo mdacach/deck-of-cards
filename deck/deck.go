@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/google/uuid"
+	"math/rand"
 )
 
 type Deck struct {
@@ -57,4 +58,16 @@ func NewPartialDeck(codes []string) (Deck, error) {
 		Cards:     cards,
 		Remaining: len(cards),
 	}, nil
+}
+
+// TODO: We may want to return a *new* deck here, and not mutate the caller.
+// There is no need to have shuffle functionality inside of creating the deck.
+// We can first create the deck, then shuffle it (if needed).
+func (d *Deck) Shuffle() {
+	// TODO: Handle the seed value here. We want to be careful here.
+	//       Do not let clients know how the deck is shuffled!
+	numberCards := len(d.Cards)
+	rand.Shuffle(numberCards, func(i, j int) {
+		d.Cards[i], d.Cards[j] = d.Cards[j], d.Cards[i]
+	})
 }
