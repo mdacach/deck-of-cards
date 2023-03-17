@@ -44,6 +44,14 @@ func NewPartialDeck(codes []string) (Deck, error) {
 		cards = append(cards, c)
 	}
 
+	cardSet := make(map[string]bool)
+	for _, code := range codes {
+		if _, exists := cardSet[code]; exists {
+			return Deck{}, errors.New("repeated card code")
+		}
+		cardSet[code] = true
+	}
+
 	return Deck{
 		ID:        uuid.New(),
 		Cards:     cards,

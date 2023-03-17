@@ -103,6 +103,10 @@ func TestNewPartialDeckInvalidScenarios(t *testing.T) {
 			name:        "invalid utf8 code",
 			cardStrings: []string{"AS", "😀D", "AC", "2C", "KH"},
 		},
+		{
+			name:        "repeated card codes",
+			cardStrings: []string{"AS", "AS", "AC", "2C", "KH"},
+		},
 	}
 
 	for _, tc := range testCases {
