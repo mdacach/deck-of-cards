@@ -40,3 +40,20 @@ func TestCardMarshalJSON(t *testing.T) {
 		assert.JSONEq(t, tc.expectedJSON, string(jsonData), "Card JSON representation is not as expected")
 	}
 }
+
+func TestCardUnmarshalJSON(t *testing.T) {
+	testCases := []struct {
+		inputJSON    string
+		expectedCard Card
+	}{
+		{`{"value":"QUEEN","suit":"HEARTS","code":"QH"}`, Card{Rank: Queen, Suit: Hearts}},
+		{`{"value":"ACE","suit":"SPADES","code":"AS"}`, Card{Rank: Ace, Suit: Spades}},
+	}
+
+	for _, tc := range testCases {
+		var c Card
+		err := json.Unmarshal([]byte(tc.inputJSON), &c)
+		assert.NoError(t, err, "Error unmarshalling card")
+		assert.Equal(t, tc.expectedCard, c, "Unmarshalled card is not as expected")
+	}
+}
