@@ -52,9 +52,7 @@ func (r Rank) LongString() string {
 	case King:
 		return "KING"
 	default:
-		// TODO: Should we return an error instead?
-		//       In Rust I would return a Result here, but maybe considering the empty string
-		//       as an error in Go is simpler and accomplishes the same as an err variable.
+		// TODO: Validate that Rank is always a valid variant (by construction).
 		return ""
 	}
 }
