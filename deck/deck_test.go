@@ -197,3 +197,45 @@ func TestDeckDraw(t *testing.T) {
 		})
 	}
 }
+
+func TestDeckDrawOrder(t *testing.T) {
+	createPartialDeck := func() Deck { d, _ := NewPartialDeck([]string{"AS", "KD", "AC", "2C", "KH"}); return d }
+	testCases := []struct {
+		name       string
+		shuffled   bool
+		drawCount  int
+		createDeck func() Deck
+	}{
+		{
+			name:       "draw 3 cards",
+			shuffled:   true,
+			drawCount:  3,
+			createDeck: createPartialDeck,
+		},
+		{
+			name:       "draw 5 cards",
+			shuffled:   false,
+			drawCount:  5,
+			createDeck: NewStandardDeck,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			deck := tc.createDeck()
+			if tc.shuffled {
+				deck.Shuffle()
+			}
+
+			orderedCards := deck.Cards
+			firstCountCards := orderedCards[:tc.drawCount]
+
+			drawnCards, err := deck.Draw(tc.drawCount)
+
+			require.NoError(t, err)
+			require.Len(t, drawnCards, tc.drawCount)
+
+			assert.Equal(t, drawnCards, firstCountCards)
+		})
+	}
+}
