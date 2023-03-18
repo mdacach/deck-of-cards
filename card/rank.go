@@ -5,6 +5,7 @@ import (
 	"strings"
 )
 
+// Rank represents the rank of a playing card (e.g., Ace, Two, ... King).
 type Rank string
 
 const (
@@ -23,10 +24,12 @@ const (
 	King  Rank = "K"
 )
 
+// Ranks returns a slice of all valid Rank values, in order (Ace first).
 func Ranks() []Rank {
 	return []Rank{Ace, Two, Three, Four, Five, Six, Seven, Eight, Nine, Ten, Jack, Queen, King}
 }
 
+// IsValid checks whether the Rank is a valid value.
 // TODO: This will be refactored. The validation will happen in the Rank constructor.
 func (r Rank) IsValid() bool {
 	for _, validRank := range Ranks() {
@@ -37,6 +40,7 @@ func (r Rank) IsValid() bool {
 	return false
 }
 
+// LongString returns the long form string representation of the Rank (e.g., "ACE", "TWO", ... "KING").
 func (r Rank) LongString() string {
 	switch r {
 	case Ace:
@@ -71,6 +75,8 @@ func (r Rank) LongString() string {
 	}
 }
 
+// ParseLongRank takes a long form rank string and returns the corresponding Rank value.
+// It returns an error if the input string is not a valid long form rank.
 func ParseLongRank(r string) (Rank, error) {
 	switch strings.ToUpper(r) {
 	case "ACE":
