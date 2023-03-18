@@ -1,3 +1,14 @@
+// Package card provides types and functions for working with standard playing cards.
+// It defines the Card, Rank, and Suit types, along with various utility functions
+// for creating and validating cards, as well as converting between short and long
+// string representations of ranks and suits.
+//
+// Example usage:
+//
+//	c, _ := card.FromString("AS")
+//	fmt.Println(c.String()) // Output: AS
+//	fmt.Println(c.Rank.LongString()) // Output: ACE
+//	fmt.Println(c.Suit.LongString()) // Output: SPADES
 package card
 
 import (
