@@ -4,6 +4,7 @@ import (
 	"deck_of_cards/deck"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"strings"
 )
 
 func SetupRouter() *gin.Engine {
@@ -15,6 +16,19 @@ func SetupRouter() *gin.Engine {
 }
 
 func createDeckHandler(c *gin.Context) {
-	d := deck.NewStandardDeck()
-	c.JSON(http.StatusOK, d)
+	queryCards, exists := c.GetQuery("cards")
+	var createdDeck deck.Deck
+	var err error
+	if exists {
+		cardCodes := strings.Split(queryCards, ",")
+		createdDeck, err = deck.NewPartialDeck(cardCodes)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+	} else {
+		createdDeck = deck.NewStandardDeck()
+	}
+
+	c.JSON(http.StatusOK, createdDeck)
 }
