@@ -3,6 +3,7 @@ package api
 import (
 	"deck_of_cards/deck"
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"net/http"
 	"strings"
 )
@@ -30,5 +31,16 @@ func createDeckHandler(c *gin.Context) {
 		createdDeck = deck.NewStandardDeck()
 	}
 
-	c.JSON(http.StatusOK, createdDeck)
+	jsonResponse := DeckResponse{
+		DeckID:    createdDeck.ID,
+		Shuffled:  false,
+		Remaining: createdDeck.Remaining,
+	}
+	c.JSON(http.StatusOK, jsonResponse)
+}
+
+type DeckResponse struct {
+	DeckID    uuid.UUID `json:"deck_id"`
+	Shuffled  bool      `json:"shuffled"`
+	Remaining int       `json:"remaining"`
 }
