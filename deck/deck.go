@@ -8,13 +8,20 @@ import (
 	"math/rand"
 )
 
+// Deck represents a deck of playing cards.
 type Deck struct {
-	ID        uuid.UUID
-	Shuffled  bool
+	// ID is a unique identifier for the deck.
+	ID uuid.UUID
+	// Shuffled indicates whether the deck has been shuffled or not.
+	Shuffled bool
+	// Remaining represents the number of cards remaining to be drawn in the deck.
 	Remaining int
-	Cards     []card.Card
+	// Cards holds the card objects in the deck.
+	// Cards are specified in draw-order (the first one in the array will be drawn first).
+	Cards []card.Card
 }
 
+// NewStandardDeck creates a new Deck containing a full set of 52 standard playing cards.
 func NewStandardDeck() Deck {
 	cards := make([]card.Card, 0, 52)
 
@@ -32,6 +39,11 @@ func NewStandardDeck() Deck {
 	}
 }
 
+// NewPartialDeck creates a new Deck containing a custom set of cards based on the provided card codes.
+// It returns an error if any of these happens:
+// 1. The codes array is empty.
+// 2. There are any invalid codes in the codes array.
+// 3. There are repeated codes in the codes array.
 func NewPartialDeck(codes []string) (Deck, error) {
 	if len(codes) == 0 {
 		return Deck{}, errors.New("a deck must have at least one card")
@@ -63,6 +75,7 @@ func NewPartialDeck(codes []string) (Deck, error) {
 	}, nil
 }
 
+// Shuffle shuffles the cards in the Deck. Note that this mutates the Deck.
 // TODO: We may want to return a *new* deck here, and not mutate the caller.
 // There is no need to have shuffle functionality inside of creating the deck.
 // We can first create the deck, then shuffle it (if needed).
@@ -77,6 +90,8 @@ func (d *Deck) Shuffle() {
 	d.Shuffled = true
 }
 
+// Draw removes and returns the specified number of cards from the top (the front) of the Deck.
+// It returns an error if there are not enough cards remaining in the Deck.
 func (d *Deck) Draw(count int) ([]card.Card, error) {
 	if count > d.Remaining {
 		return nil, fmt.Errorf("not enough cards remaining in the deck")
