@@ -8,6 +8,8 @@ import (
 	"strings"
 )
 
+var DeckStore *deck.Store
+
 func SetupRouter() *gin.Engine {
 	r := gin.Default()
 
@@ -37,6 +39,12 @@ func createDeckHandler(c *gin.Context) {
 	if shuffledStr == "true" {
 		shuffled = true
 		createdDeck.Shuffle()
+	}
+
+	err = DeckStore.Add(&createdDeck)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, "")
+		return
 	}
 
 	jsonResponse := DeckResponse{
