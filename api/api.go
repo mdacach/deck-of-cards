@@ -1,6 +1,7 @@
 package api
 
 import (
+	"deck_of_cards/card"
 	"deck_of_cards/deck"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -14,6 +15,7 @@ func SetupRouter() *gin.Engine {
 	r := gin.Default()
 
 	r.POST("/decks", createDeckHandler)
+	r.GET("/decks/:deck_id", openDeckHandler)
 
 	return r
 }
@@ -59,4 +61,31 @@ type DeckResponse struct {
 	DeckID    uuid.UUID `json:"deck_id"`
 	Shuffled  bool      `json:"shuffled"`
 	Remaining int       `json:"remaining"`
+}
+
+func openDeckHandler(c *gin.Context) {
+	deckID, err := uuid.Parse(c.Param("deck_id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Deck ID is not valid."})
+	}
+
+	deckRetrieved, notFound := DeckStore.Get(deckID)
+	if notFound != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Deck not found. Are you sure deck_id is correct?"})
+	}
+
+	jsonResponse := OpenDeckResponse{
+		DeckID:    deckRetrieved.ID,
+		Shuffled:  deckRetrieved.Shuffled,
+		Remaining: deckRetrieved.Remaining,
+		Cards:     deckRetrieved.Cards,
+	}
+	c.JSON(http.StatusOK, jsonResponse)
+}
+
+type OpenDeckResponse struct {
+	DeckID    uuid.UUID   `json:"deck_id"`
+	Shuffled  bool        `json:"shuffled"`
+	Remaining int         `json:"remaining"`
+	Cards     []card.Card `json:"cards"`
 }

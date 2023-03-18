@@ -6,6 +6,7 @@ import (
 	"deck_of_cards/card"
 	"deck_of_cards/deck"
 	"encoding/json"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -124,4 +125,42 @@ func TestCreateStandardDeckShuffled(t *testing.T) {
 	assert.NotEmpty(t, resp.DeckID)
 	assert.True(t, resp.Shuffled)
 	assert.Equal(t, 52, resp.Remaining)
+}
+
+func TestOpenDeck(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+	router := api.SetupRouter()
+	// TODO: Improve this. It's not nice to need to set this global variable every time.
+	//       Will probably remove the global variable, but if not, at least create a setup function for tests.
+	api.DeckStore = deck.NewStore()
+
+	// 1. Create the deck through the Create endpoint. It will be stored (somewhere).
+	// Create a new standard deck using the Create Deck endpoint.
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("POST", "/decks", nil)
+	router.ServeHTTP(w, req)
+
+	require.Equal(t, http.StatusOK, w.Code)
+
+	var createResponse api.DeckResponse
+	err := json.Unmarshal(w.Body.Bytes(), &createResponse)
+	require.NoError(t, err)
+
+	// Keep track of the deck's ID.
+	deckID := createResponse.DeckID
+
+	// 2. Open the (same) deck through Open endpoint.
+	w = httptest.NewRecorder()
+	req, _ = http.NewRequest("GET", fmt.Sprintf("/decks/%s", deckID), nil)
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+
+	var openResponse api.OpenDeckResponse
+	err = json.Unmarshal(w.Body.Bytes(), &openResponse)
+	require.NoError(t, err)
+
+	assert.Equal(t, deckID, openResponse.DeckID, "Deck ID does not change after it is created.")
+	assert.False(t, openResponse.Shuffled, "Deck Shuffled does not change after it is created.")
+	assert.Equal(t, 52, openResponse.Remaining, "If we do not Draw from the deck, all cards still remain.")
 }
