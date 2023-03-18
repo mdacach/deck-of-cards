@@ -164,3 +164,52 @@ func TestOpenDeck(t *testing.T) {
 	assert.False(t, openResponse.Shuffled, "Deck Shuffled does not change after it is created.")
 	assert.Equal(t, 52, openResponse.Remaining, "If we do not Draw from the deck, all cards still remain.")
 }
+
+func TestOpenPartialDeck(t *testing.T) {
+	router := api.SetupRouter()
+	ts := httptest.NewServer(router)
+	defer ts.Close()
+	api.DeckStore = deck.NewStore()
+
+	cardCodes := "AS,KD,AC,2C,KH"
+	expectedCards := []card.Card{
+		{Rank: "A", Suit: "S"},
+		{Rank: "K", Suit: "D"},
+		{Rank: "A", Suit: "C"},
+		{Rank: "2", Suit: "C"},
+		{Rank: "K", Suit: "H"},
+	}
+
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("POST", "/decks?cards="+cardCodes, nil)
+	router.ServeHTTP(w, req)
+
+	require.Equal(t, http.StatusOK, w.Code)
+
+	var createResponse api.DeckResponse
+	err := json.Unmarshal(w.Body.Bytes(), &createResponse)
+	require.NoError(t, err)
+
+	// Keep track of the deck's ID.
+	deckID := createResponse.DeckID
+
+	// 2. Open the (same) deck through Open endpoint.
+	w = httptest.NewRecorder()
+	req, _ = http.NewRequest("GET", fmt.Sprintf("/decks/%s", deckID), nil)
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+
+	var openResponse api.OpenDeckResponse
+	err = json.Unmarshal(w.Body.Bytes(), &openResponse)
+	require.NoError(t, err)
+
+	assert.Equal(t, deckID, openResponse.DeckID, "Deck ID does not change after it is created.")
+	assert.False(t, openResponse.Shuffled, "Deck Shuffled does not change after it is created.")
+	assert.Equal(t, len(expectedCards), openResponse.Remaining, "If we do not Draw from the deck, all cards still remain.")
+
+	// The cards are in the correct order (the order we specified in the request).
+	for i, c := range expectedCards {
+		assert.Equal(t, c, openResponse.Cards[i])
+	}
+}
