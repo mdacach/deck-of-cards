@@ -1,3 +1,15 @@
+// Package deck provides the Store type for managing multiple decks of cards in a
+// thread-safe manner. It offers methods for creating a new store, adding a deck,
+// getting a deck by its ID, and removing a deck by its ID.
+//
+// Example usage:
+//
+//	s := store.NewStore()
+//	d := deck.NewStandardDeck()
+//	_ = s.Add(&d)
+//	retrievedDeck, _ := s.Get(d.ID)
+//	fmt.Println(retrievedDeck.ID == d.ID) // Output: true
+//	_ = s.Remove(d.ID)
 package deck
 
 import (
