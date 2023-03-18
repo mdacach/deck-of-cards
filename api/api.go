@@ -1,3 +1,7 @@
+// Package api provides the HTTP API for working with decks of playing cards.
+// It uses the Gin web framework to handle HTTP requests and the deck and card
+// packages to create and manage decks of cards. The package exposes endpoints
+// for creating decks, opening decks, and drawing cards from decks.
 package api
 
 import (
@@ -51,7 +55,7 @@ func createDeckHandler(c *gin.Context) {
 		return
 	}
 
-	jsonResponse := DeckResponse{
+	jsonResponse := CreateDeckResponse{
 		DeckID:    createdDeck.ID,
 		Shuffled:  shuffled,
 		Remaining: createdDeck.Remaining,
@@ -59,7 +63,7 @@ func createDeckHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, jsonResponse)
 }
 
-type DeckResponse struct {
+type CreateDeckResponse struct {
 	DeckID    uuid.UUID `json:"deck_id"`
 	Shuffled  bool      `json:"shuffled"`
 	Remaining int       `json:"remaining"`

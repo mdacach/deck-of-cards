@@ -31,7 +31,7 @@ func TestCreateDeckHandler(t *testing.T) {
 	assert.Equal(t, resp.StatusCode, http.StatusOK)
 
 	// Decode the response body into a Deck.
-	var createdDeck api.DeckResponse
+	var createdDeck api.CreateDeckResponse
 	err = json.NewDecoder(resp.Body).Decode(&createdDeck)
 	assert.NoError(t, err)
 
@@ -52,7 +52,7 @@ func TestCreatePartialDeckEndpoint(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, http.StatusOK, resp.StatusCode)
 
-	var createdDeck api.DeckResponse
+	var createdDeck api.CreateDeckResponse
 	err = json.NewDecoder(resp.Body).Decode(&createdDeck)
 	require.NoError(t, err)
 
@@ -112,11 +112,11 @@ func TestCreateStandardDeckShuffled(t *testing.T) {
 
 	assert.Equal(t, http.StatusOK, w.Code)
 
-	var resp api.DeckResponse
+	var resp api.CreateDeckResponse
 	err := json.Unmarshal(w.Body.Bytes(), &resp)
 	assert.NoError(t, err)
 
-	// From DeckResponse we do not have access to the cards directly,
+	// From CreateDeckResponse we do not have access to the cards directly,
 	// but let's assert that the shuffled requirement was set.
 	assert.NotEmpty(t, resp.DeckID)
 	assert.True(t, resp.Shuffled)
@@ -138,7 +138,7 @@ func TestOpenDeck(t *testing.T) {
 
 	require.Equal(t, http.StatusOK, w.Code)
 
-	var createResponse api.DeckResponse
+	var createResponse api.CreateDeckResponse
 	err := json.Unmarshal(w.Body.Bytes(), &createResponse)
 	require.NoError(t, err)
 
@@ -182,7 +182,7 @@ func TestOpenPartialDeck(t *testing.T) {
 
 	require.Equal(t, http.StatusOK, w.Code)
 
-	var createResponse api.DeckResponse
+	var createResponse api.CreateDeckResponse
 	err := json.Unmarshal(w.Body.Bytes(), &createResponse)
 	require.NoError(t, err)
 
@@ -215,7 +215,7 @@ func createTestDeck(router *gin.Engine, params string) uuid.UUID {
 	req, _ := http.NewRequest("POST", "/decks"+params, nil)
 	router.ServeHTTP(w, req)
 
-	var createResponse api.DeckResponse
+	var createResponse api.CreateDeckResponse
 	// This should never fail.
 	_ = json.Unmarshal(w.Body.Bytes(), &createResponse)
 
