@@ -11,8 +11,9 @@ func TestNewStandardDeck(t *testing.T) {
 	deck := NewStandardDeck()
 
 	assert.NotNil(t, deck.ID, "Deck ID should not be nil")
-	assert.Len(t, deck.Cards, 52, "A standard deck should have 52 cards")
+	assert.Equal(t, deck.Shuffled, false, "A standard deck is not shuffled by default")
 	assert.Equal(t, deck.Remaining, len(deck.Cards), "A standard deck should start with 52 cards remaining")
+	assert.Len(t, deck.Cards, 52, "A standard deck should have 52 cards")
 
 	cardCount := make(map[card.Card]int)
 
@@ -36,8 +37,9 @@ func TestNewPartialDeckCards(t *testing.T) {
 	assert.NoError(t, err, "Creating a partial deck with example codes should not return an error")
 	// Relevant fields are populated.
 	assert.NotNil(t, deck.ID, "Deck ID should not be nil")
-	assert.Len(t, deck.Cards, len(codes), "Partial deck should have the specified number of cards")
+	assert.Equal(t, deck.Shuffled, false, "A partial deck is not shuffled by default")
 	assert.Equal(t, len(codes), deck.Remaining, "Remaining cards should match the number of input codes")
+	assert.Len(t, deck.Cards, len(codes), "Partial deck should have the specified number of cards")
 
 	// The cards we passed by code are the deck's cards.
 	for i, code := range codes {
@@ -146,6 +148,7 @@ func TestShuffle(t *testing.T) {
 			// There is a *very* small probability of this test failing (the shuffle may end up with the cards in the same place).
 			// Sorry if that happens to you...
 			assert.NotEqual(t, originalCards, d.Cards, "the order of cards should change after shuffling")
+			assert.Equal(t, d.Shuffled, true, "deck is marked shuffled")
 		})
 	}
 }

@@ -10,8 +10,9 @@ import (
 
 type Deck struct {
 	ID        uuid.UUID
-	Cards     []card.Card
+	Shuffled  bool
 	Remaining int
+	Cards     []card.Card
 }
 
 func NewStandardDeck() Deck {
@@ -25,8 +26,9 @@ func NewStandardDeck() Deck {
 
 	return Deck{
 		ID:        uuid.New(),
-		Cards:     cards,
+		Shuffled:  false,
 		Remaining: len(cards),
+		Cards:     cards,
 	}
 }
 
@@ -55,8 +57,9 @@ func NewPartialDeck(codes []string) (Deck, error) {
 
 	return Deck{
 		ID:        uuid.New(),
-		Cards:     cards,
+		Shuffled:  false,
 		Remaining: len(cards),
+		Cards:     cards,
 	}, nil
 }
 
@@ -70,6 +73,8 @@ func (d *Deck) Shuffle() {
 	rand.Shuffle(numberCards, func(i, j int) {
 		d.Cards[i], d.Cards[j] = d.Cards[j], d.Cards[i]
 	})
+
+	d.Shuffled = true
 }
 
 func (d *Deck) Draw(count int) ([]card.Card, error) {
