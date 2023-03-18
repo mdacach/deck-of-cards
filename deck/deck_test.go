@@ -161,6 +161,11 @@ func TestDeckDraw(t *testing.T) {
 		expectedCards int
 	}{
 		{
+			name:        "draw zero cards",
+			drawCount:   0,
+			expectedErr: true,
+		},
+		{
 			name:          "draw one card",
 			drawCount:     1,
 			expectedErr:   false,

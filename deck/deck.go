@@ -82,6 +82,10 @@ func (d *Deck) Draw(count int) ([]card.Card, error) {
 		return nil, fmt.Errorf("not enough cards remaining in the deck")
 	}
 
+	if count <= 0 {
+		return nil, fmt.Errorf("draw count should be positive")
+	}
+
 	// We copy all drawn cards at once to avoid reallocating the array multiple times.
 	drawnCards := make([]card.Card, count)
 	copy(drawnCards, d.Cards[:count]) // We don't want to mutate d.Cards from drawnCards.
