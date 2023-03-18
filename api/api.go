@@ -31,9 +31,17 @@ func createDeckHandler(c *gin.Context) {
 		createdDeck = deck.NewStandardDeck()
 	}
 
+	// TODO: Some better, strongly typed way of doing this?
+	shuffledStr := c.DefaultQuery("shuffled", "false")
+	shuffled := false
+	if shuffledStr == "true" {
+		shuffled = true
+		createdDeck.Shuffle()
+	}
+
 	jsonResponse := DeckResponse{
 		DeckID:    createdDeck.ID,
-		Shuffled:  false,
+		Shuffled:  shuffled,
 		Remaining: createdDeck.Remaining,
 	}
 	c.JSON(http.StatusOK, jsonResponse)

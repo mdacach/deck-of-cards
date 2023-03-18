@@ -104,3 +104,24 @@ func TestCreateDeckHandlerInvalidRequests(t *testing.T) {
 		})
 	}
 }
+
+func TestCreateStandardDeckShuffled(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+	router := api.SetupRouter()
+
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("POST", "/decks?shuffled=true", nil)
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+
+	var resp api.DeckResponse
+	err := json.Unmarshal(w.Body.Bytes(), &resp)
+	assert.NoError(t, err)
+
+	// From DeckResponse we do not have access to the cards directly,
+	// but let's assert that the shuffled requirement was set.
+	assert.NotEmpty(t, resp.DeckID)
+	assert.True(t, resp.Shuffled)
+	assert.Equal(t, 52, resp.Remaining)
+}
