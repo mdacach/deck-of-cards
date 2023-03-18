@@ -6,12 +6,15 @@ import (
 	"fmt"
 )
 
+// Card represents a single playing card with a rank and suit.
 // TODO: Use type-driven-development newtype pattern to make sure string card rank and suit is valid.
 type Card struct {
 	Rank Rank
 	Suit Suit
 }
 
+// FromString creates a Card instance from a string input (e.g., "4H" for the Four of Hearts).
+// It returns an error if the input string is invalid.
 func FromString(s string) (Card, error) {
 	// All codes have at least two characters (one for Rank, one for Suit).
 	if len(s) < 2 {
@@ -40,6 +43,8 @@ func FromString(s string) (Card, error) {
 	return Card{Rank: rank, Suit: suit}, nil
 }
 
+// MarshalJSON customizes the JSON marshaling of the Card struct. It returns a JSON object
+// with the long form value of the rank, long form value of the suit, and the card code.
 func (c Card) MarshalJSON() ([]byte, error) {
 	cardJSON := struct {
 		Value string `json:"value"`
@@ -54,6 +59,9 @@ func (c Card) MarshalJSON() ([]byte, error) {
 	return json.Marshal(cardJSON)
 }
 
+// UnmarshalJSON customizes the JSON unmarshalling of the Card struct. It expects a JSON object
+// with the long form value of the rank and the long form value of the suit. It returns an error
+// if the input JSON is invalid.
 func (c *Card) UnmarshalJSON(data []byte) error {
 	cardJSON := struct {
 		Value string `json:"value"`
@@ -80,6 +88,8 @@ func (c *Card) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+// String returns a string representation of the Card (e.g., "4H" for the Four of Hearts).
+// This is also referred as the `Code` of the Card.
 func (c Card) String() string {
 	return fmt.Sprintf("%s%s", c.Rank, c.Suit)
 }
