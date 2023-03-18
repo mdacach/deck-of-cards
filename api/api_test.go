@@ -22,6 +22,7 @@ func TestCreateDeckHandler(t *testing.T) {
 	router := api.SetupRouter()
 	server := httptest.NewServer(router)
 	defer server.Close()
+	api.DeckStore = deck.NewStore()
 
 	// Perform a POST request to the /decks endpoint.
 	resp, err := http.Post(server.URL+"/decks", "application/json", nil)
@@ -30,29 +31,28 @@ func TestCreateDeckHandler(t *testing.T) {
 	assert.Equal(t, resp.StatusCode, http.StatusOK)
 
 	// Decode the response body into a Deck.
-	var createdDeck deck.Deck
+	var createdDeck api.DeckResponse
 	err = json.NewDecoder(resp.Body).Decode(&createdDeck)
 	assert.NoError(t, err)
 
 	// Assert that the created deck has the expected number of cards.
 	assert.Equal(t, createdDeck.Remaining, 52)
 	// Created deck has an ID.
-	assert.NotNil(t, createdDeck.ID)
-	// Created deck has 52 cards.
-	assert.Equal(t, len(createdDeck.Cards), 52)
+	assert.NotNil(t, createdDeck.DeckID)
 }
 
 func TestCreatePartialDeckEndpoint(t *testing.T) {
 	router := api.SetupRouter()
 	ts := httptest.NewServer(router)
 	defer ts.Close()
+	api.DeckStore = deck.NewStore()
 
 	cards := "AS,KD,AC,2C,KH"
 	resp, err := http.Post(ts.URL+"/decks?cards="+cards, "", nil)
 	require.NoError(t, err)
 	require.Equal(t, http.StatusOK, resp.StatusCode)
 
-	var createdDeck deck.Deck
+	var createdDeck api.DeckResponse
 	err = json.NewDecoder(resp.Body).Decode(&createdDeck)
 	require.NoError(t, err)
 
@@ -64,12 +64,7 @@ func TestCreatePartialDeckEndpoint(t *testing.T) {
 		{Rank: "K", Suit: "H"},
 	}
 
-	assert.Equal(t, len(expectedCards), len(createdDeck.Cards))
 	assert.Equal(t, len(expectedCards), createdDeck.Remaining)
-
-	for i, c := range expectedCards {
-		assert.Equal(t, c, createdDeck.Cards[i])
-	}
 }
 
 func TestCreateDeckHandlerInvalidRequests(t *testing.T) {
