@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"net/http"
@@ -212,4 +213,136 @@ func TestOpenPartialDeck(t *testing.T) {
 	for i, c := range expectedCards {
 		assert.Equal(t, c, openResponse.Cards[i])
 	}
+}
+
+func createTestDeck(router *gin.Engine, params string) uuid.UUID {
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("POST", "/decks"+params, nil)
+	router.ServeHTTP(w, req)
+
+	var createResponse api.DeckResponse
+	// This should never fail.
+	_ = json.Unmarshal(w.Body.Bytes(), &createResponse)
+
+	deckID := createResponse.DeckID
+
+	return deckID
+}
+
+func TestDrawCardHandler(t *testing.T) {
+	router := api.SetupRouter()
+	api.DeckStore = deck.NewStore()
+
+	// Define test cases
+	type testCase struct {
+		name         string
+		deckID       string
+		count        string
+		expectedCode int
+	}
+
+	validID := createTestDeck(router, "").String()
+
+	testCases := []testCase{
+		{
+			name:         "Invalid deck ID",
+			deckID:       "invalid-deck-id",
+			count:        "5",
+			expectedCode: http.StatusBadRequest,
+		},
+		{
+			name:         "No count parameter provided",
+			deckID:       validID,
+			count:        "",
+			expectedCode: http.StatusBadRequest,
+		},
+		{
+			name:         "Invalid count parameter",
+			deckID:       validID,
+			count:        "invalid-count",
+			expectedCode: http.StatusBadRequest,
+		},
+		{
+			name:         "Non-positive count parameter",
+			deckID:       validID,
+			count:        "-5",
+			expectedCode: http.StatusBadRequest,
+		},
+		{
+			name:         "Deck not found",
+			deckID:       uuid.NewString(),
+			count:        "5",
+			expectedCode: http.StatusBadRequest,
+		},
+	}
+
+	// Test the drawCardHandler
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			// Create a request with the test data
+			req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("/decks/%s/draw?count=%s", tc.deckID, tc.count), nil)
+			if err != nil {
+				t.Fatalf("Failed to create request: %v", err)
+			}
+
+			// Execute the request and record the response
+			rr := httptest.NewRecorder()
+			router.ServeHTTP(rr, req)
+
+			// Use assert to check if the expected code matches the actual code
+			assert.Equal(t, tc.expectedCode, rr.Code, "Expected status code to match")
+		})
+	}
+}
+
+func TestDrawPartialDeck(t *testing.T) {
+	router := api.SetupRouter()
+	api.DeckStore = deck.NewStore()
+
+	cardCodes := "QH,4D,AC,2C,KH"
+	expectedCards := []card.Card{
+		{Rank: "Q", Suit: "H"},
+		{Rank: "4", Suit: "D"},
+		{Rank: "A", Suit: "C"},
+		{Rank: "2", Suit: "C"},
+		{Rank: "K", Suit: "H"},
+	}
+
+	deckID := createTestDeck(router, "?cards="+cardCodes)
+
+	// Draw the first card: it should be the Queen of Hearts (QH).
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("GET", fmt.Sprintf("/decks/%s/draw?count=1", deckID), nil)
+	router.ServeHTTP(w, req)
+	assert.Equal(t, http.StatusOK, w.Code)
+
+	var drawResponse api.DrawCardsResponse
+	_ = json.Unmarshal(w.Body.Bytes(), &drawResponse)
+	drawnCards := drawResponse.Cards
+	assert.Equal(t, len(drawnCards), 1, "One card is drawn.")
+	assert.Equal(t, drawnCards[0], expectedCards[0], "Card drawn is the first in the deck.")
+
+	// Draw a new card: it should be the 4 of Diamonds (4D).
+	req, _ = http.NewRequest("GET", fmt.Sprintf("/decks/%s/draw?count=1", deckID), nil)
+	w = httptest.NewRecorder()
+	router.ServeHTTP(w, req)
+	assert.Equal(t, http.StatusOK, w.Code)
+
+	_ = json.Unmarshal(w.Body.Bytes(), &drawResponse)
+	drawnCards = drawResponse.Cards
+	assert.Equal(t, len(drawnCards), 1, "One card is drawn.")
+	assert.Equal(t, drawnCards[0], expectedCards[1], "Card drawn is the (currently) first in the deck.")
+
+	// Draw the three last cards.
+	req, _ = http.NewRequest("GET", fmt.Sprintf("/decks/%s/draw?count=3", deckID), nil)
+	w = httptest.NewRecorder()
+	router.ServeHTTP(w, req)
+	assert.Equal(t, http.StatusOK, w.Code)
+
+	_ = json.Unmarshal(w.Body.Bytes(), &drawResponse)
+	drawnCards = drawResponse.Cards
+	assert.Equal(t, len(drawnCards), 3, "Three cards are drawn.")
+	assert.Equal(t, drawnCards[0], expectedCards[2], "Card drawn is the (currently) first in the deck.")
+	assert.Equal(t, drawnCards[1], expectedCards[3], "Next card drawn is the (currently) first in the deck.")
+	assert.Equal(t, drawnCards[2], expectedCards[4], "Next card drawn is the (currently) first in the deck.")
 }

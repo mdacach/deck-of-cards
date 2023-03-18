@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"net/http"
+	"strconv"
 	"strings"
 )
 
@@ -16,6 +17,7 @@ func SetupRouter() *gin.Engine {
 
 	r.POST("/decks", createDeckHandler)
 	r.GET("/decks/:deck_id", openDeckHandler)
+	r.GET("/decks/:deck_id/draw", drawCardHandler)
 
 	return r
 }
@@ -88,4 +90,39 @@ type OpenDeckResponse struct {
 	Shuffled  bool        `json:"shuffled"`
 	Remaining int         `json:"remaining"`
 	Cards     []card.Card `json:"cards"`
+}
+
+func drawCardHandler(c *gin.Context) {
+	deckID, err := uuid.Parse(c.Param("deck_id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Deck ID is not valid."})
+		return
+	}
+
+	countStr, exists := c.GetQuery("count")
+	if !exists {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Count parameter must be provided."})
+		return
+	}
+	count, err := strconv.Atoi(countStr)
+	if err != nil || count <= 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Count parameter must be a positive integer"})
+		return
+	}
+
+	deckRetrieved, notFound := DeckStore.Get(deckID)
+	if notFound != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Deck not found. Are you sure deck_id is correct?"})
+		return
+	}
+
+	drawnCards, err := deckRetrieved.Draw(count)
+	jsonResponse := DrawCardsResponse{
+		Cards: drawnCards,
+	}
+	c.JSON(http.StatusOK, jsonResponse)
+}
+
+type DrawCardsResponse struct {
+	Cards []card.Card `json:"cards"`
 }
