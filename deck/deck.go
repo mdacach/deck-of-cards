@@ -1,3 +1,13 @@
+// Package deck provides the Deck type for managing a deck of playing cards, and related
+// utility functions for creating and manipulating decks.
+// It allows you to create a standard deck, a partial deck, shuffle the deck, and draw cards.
+//
+// Example usage:
+//
+//	d := deck.NewStandardDeck()
+//	d.Shuffle()
+//	drawnCards, _ := d.Draw(5)
+//	fmt.Println(drawnCards)
 package deck
 
 import (
