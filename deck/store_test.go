@@ -4,6 +4,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"sync"
 	"testing"
 )
 
@@ -92,4 +93,32 @@ func TestStoreRemoveNonExistentDeck(t *testing.T) {
 	nonExistentID := uuid.New()
 	err := store.Remove(nonExistentID)
 	assert.Error(t, err)
+}
+
+func TestStoreConcurrentAccess(t *testing.T) {
+	store := NewStore()
+	const concurrentOps = 50
+	const deckCount = 50
+
+	var wg sync.WaitGroup
+	wg.Add(concurrentOps)
+
+	for i := 0; i < concurrentOps; i++ {
+		deck := NewStandardDeck()
+		go func() {
+			defer wg.Done()
+			_ = store.Add(&deck)
+		}()
+	}
+
+	wg.Wait()
+
+	// Check that each deck was correctly stored (no concurrent writes).
+	finalDeckCount := 0
+	for _, deck := range store.decks {
+		if deck != nil {
+			finalDeckCount++
+		}
+	}
+	assert.Equal(t, deckCount, finalDeckCount, "Expected %d decks in the store after concurrent operations", deckCount)
 }
