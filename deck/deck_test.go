@@ -21,6 +21,7 @@ func TestNewStandardDeck(t *testing.T) {
 		cardCount[c]++
 	}
 
+	// Note that because Suits and Ranks are in order, we are also testing if the un-shuffled deck is in the correct order.
 	for _, s := range card.Suits() {
 		for _, r := range card.Ranks() {
 			c := card.Card{Rank: r, Suit: s}
@@ -206,44 +207,82 @@ func TestDeckDraw(t *testing.T) {
 	}
 }
 
-func TestDeckDrawOrder(t *testing.T) {
-	createPartialDeck := func() Deck { d, _ := NewPartialDeck([]string{"AS", "KD", "AC", "2C", "KH"}); return d }
+func TestStandardDeckDrawOrder(t *testing.T) {
 	testCases := []struct {
-		name       string
-		shuffled   bool
-		drawCount  int
-		createDeck func() Deck
+		name     string
+		shuffled bool
 	}{
 		{
-			name:       "draw 3 cards",
-			shuffled:   true,
-			drawCount:  3,
-			createDeck: createPartialDeck,
+			name:     "draw multiple times from un-shuffled deck",
+			shuffled: false,
 		},
 		{
-			name:       "draw 5 cards",
-			shuffled:   false,
-			drawCount:  5,
-			createDeck: NewStandardDeck,
+			name:     "draw multiple times from shuffled deck",
+			shuffled: true,
 		},
 	}
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			deck := tc.createDeck()
+			deck := NewStandardDeck()
 			if tc.shuffled {
 				deck.Shuffle()
 			}
 
-			orderedCards := deck.Cards
-			firstCountCards := orderedCards[:tc.drawCount]
+			drawAmounts := []int{2, 5, 1}
+			for i := 0; i < 3; i++ {
+				orderedCards := deck.Cards
+				drawCount := drawAmounts[i]
+				firstCountCards := orderedCards[:drawCount]
 
-			drawnCards, err := deck.Draw(tc.drawCount)
+				drawnCards, err := deck.Draw(drawCount)
 
-			require.NoError(t, err)
-			require.Len(t, drawnCards, tc.drawCount)
+				require.NoError(t, err, "Valid draw amounts do not throw error")
+				require.Len(t, drawnCards, drawCount, "Drawn amount is the same as asked")
 
-			assert.Equal(t, drawnCards, firstCountCards)
+				assert.Equal(t, drawnCards, firstCountCards, "Drawn cards are the first in the deck")
+			}
 		})
 	}
+
+}
+
+func TestPartialDeckDrawOrder(t *testing.T) {
+	testCases := []struct {
+		name     string
+		shuffled bool
+	}{
+		{
+			name:     "draw multiple times from un-shuffled deck",
+			shuffled: false,
+		},
+		{
+			name:     "draw multiple times from shuffled deck",
+			shuffled: true,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			deck, _ := NewPartialDeck([]string{"AS", "KD", "AC", "2C", "KH", "2H", "2S", "JH"})
+			if tc.shuffled {
+				deck.Shuffle()
+			}
+
+			drawAmounts := []int{2, 3, 1}
+			for i := 0; i < 3; i++ {
+				orderedCards := deck.Cards
+				drawCount := drawAmounts[i]
+				firstCountCards := orderedCards[:drawCount]
+
+				drawnCards, err := deck.Draw(drawCount)
+
+				require.NoError(t, err, "Valid draw amounts do not throw error")
+				require.Len(t, drawnCards, drawCount, "Drawn amount is the same as asked")
+
+				assert.Equal(t, drawnCards, firstCountCards, "Drawn cards are the first in the deck")
+			}
+		})
+	}
+
 }
