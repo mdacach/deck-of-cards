@@ -17,12 +17,7 @@ import (
 )
 
 func TestCreateDeckHandler(t *testing.T) {
-	// Set up the Gin router and test server
-	gin.SetMode(gin.TestMode) // Lightweight mode for testing.
-	router := api.SetupRouter()
-	server := httptest.NewServer(router)
-	defer server.Close()
-	api.DeckStore = deck.NewStore()
+	router := setup()
 
 	// Perform a POST request to the /decks endpoint.
 	resp, err := http.Post(server.URL+"/decks", "application/json", nil)
@@ -42,10 +37,7 @@ func TestCreateDeckHandler(t *testing.T) {
 }
 
 func TestCreatePartialDeckEndpoint(t *testing.T) {
-	router := api.SetupRouter()
-	ts := httptest.NewServer(router)
-	defer ts.Close()
-	api.DeckStore = deck.NewStore()
+	router := setup()
 
 	cards := "AS,KD,AC,2C,KH"
 	resp, err := http.Post(ts.URL+"/decks?cards="+cards, "", nil)
@@ -68,7 +60,7 @@ func TestCreatePartialDeckEndpoint(t *testing.T) {
 }
 
 func TestCreateDeckHandlerInvalidRequests(t *testing.T) {
-	router := api.SetupRouter()
+	router := setup()
 
 	testCases := []struct {
 		name       string
@@ -103,8 +95,7 @@ func TestCreateDeckHandlerInvalidRequests(t *testing.T) {
 }
 
 func TestCreateStandardDeckShuffled(t *testing.T) {
-	gin.SetMode(gin.TestMode)
-	router := api.SetupRouter()
+	router := setup()
 
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("POST", "/decks?shuffled=true", nil)
@@ -124,11 +115,7 @@ func TestCreateStandardDeckShuffled(t *testing.T) {
 }
 
 func TestOpenDeck(t *testing.T) {
-	gin.SetMode(gin.TestMode)
-	router := api.SetupRouter()
-	// TODO: Improve this. It's not nice to need to set this global variable every time.
-	//       Will probably remove the global variable, but if not, at least create a setup function for tests.
-	api.DeckStore = deck.NewStore()
+	router := setup()
 
 	// 1. Create the deck through the Create endpoint. It will be stored (somewhere).
 	// Create a new standard deck using the Create Deck endpoint.
@@ -162,10 +149,7 @@ func TestOpenDeck(t *testing.T) {
 }
 
 func TestOpenPartialDeck(t *testing.T) {
-	router := api.SetupRouter()
-	ts := httptest.NewServer(router)
-	defer ts.Close()
-	api.DeckStore = deck.NewStore()
+	router := setup()
 
 	cardCodes := "AS,KD,AC,2C,KH"
 	expectedCards := []card.Card{
@@ -225,8 +209,7 @@ func createTestDeck(router *gin.Engine, params string) uuid.UUID {
 }
 
 func TestDrawCardHandler(t *testing.T) {
-	router := api.SetupRouter()
-	api.DeckStore = deck.NewStore()
+	router := setup()
 
 	// Define test cases
 	type testCase struct {
@@ -291,8 +274,7 @@ func TestDrawCardHandler(t *testing.T) {
 }
 
 func TestDrawPartialDeck(t *testing.T) {
-	router := api.SetupRouter()
-	api.DeckStore = deck.NewStore()
+	router := setup()
 
 	cardCodes := "QH,4D,AC,2C,KH"
 	expectedCards := []card.Card{
@@ -340,4 +322,16 @@ func TestDrawPartialDeck(t *testing.T) {
 	assert.Equal(t, drawnCards[0], expectedCards[2], "Card drawn is the (currently) first in the deck.")
 	assert.Equal(t, drawnCards[1], expectedCards[3], "Next card drawn is the (currently) first in the deck.")
 	assert.Equal(t, drawnCards[2], expectedCards[4], "Next card drawn is the (currently) first in the deck.")
+}
+
+// TODO: Some way to make this run before each test?
+func setup() *gin.Engine {
+	// Lightweight mode for testing.
+	gin.SetMode(gin.TestMode)
+
+	// Set up the Gin router and Store.
+	router := api.SetupRouter()
+	api.DeckStore = deck.NewStore()
+
+	return router
 }
