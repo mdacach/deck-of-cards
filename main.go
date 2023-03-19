@@ -14,13 +14,16 @@ import (
 	"deck_of_cards/api"
 	"deck_of_cards/deck"
 	"fmt"
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
 	// TODO: Change this to (probably) Dependency Injection.
+	// Initialize the Deck Store that will be used by the endpoints.
+	// Note that the Store is concurrent.
 	api.DeckStore = deck.NewStore()
-	r := api.SetupRouter()
-	r.Run(":8080")
+
+	gin.SetMode(gin.ReleaseMode)
 	router := api.SetupRouter()
 
 	// TODO: Get port to run from flag/env variable
