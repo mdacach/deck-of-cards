@@ -21,9 +21,9 @@ var DeckStore *deck.Store
 func SetupRouter() *gin.Engine {
 	r := gin.Default()
 
-	r.POST("/decks", createDeckHandler)
-	r.GET("/decks/:deck_id", openDeckHandler)
-	r.GET("/decks/:deck_id/draw", drawCardHandler)
+	r.POST("/deck/new", createDeckHandler)
+	r.GET("/deck/:deck_id", openDeckHandler)
+	r.GET("/deck/:deck_id/draw", drawCardHandler)
 
 	return r
 }

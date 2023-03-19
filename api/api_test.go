@@ -20,7 +20,7 @@ func TestCreateDeckHandler(t *testing.T) {
 
 	// Perform a POST request to the /decks endpoint.
 	w := httptest.NewRecorder()
-	req := httptest.NewRequest(http.MethodPost, "/decks", nil)
+	req := httptest.NewRequest(http.MethodPost, "/deck/new", nil)
 	router.ServeHTTP(w, req)
 
 	assert.Equal(t, w.Code, http.StatusOK)
@@ -41,7 +41,7 @@ func TestCreatePartialDeckEndpoint(t *testing.T) {
 
 	cards := "AS,KD,AC,2C,KH"
 	w := httptest.NewRecorder()
-	req := httptest.NewRequest(http.MethodPost, "/decks?cards="+cards, nil)
+	req := httptest.NewRequest(http.MethodPost, "/deck/new?cards="+cards, nil)
 	router.ServeHTTP(w, req)
 
 	require.Equal(t, w.Code, http.StatusOK)
@@ -85,7 +85,7 @@ func TestCreateDeckHandlerInvalidRequests(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			w := httptest.NewRecorder()
-			req := httptest.NewRequest(http.MethodPost, "/decks?cards="+tc.cardsParam, nil)
+			req := httptest.NewRequest(http.MethodPost, "/deck/new?cards="+tc.cardsParam, nil)
 			router.ServeHTTP(w, req)
 
 			assert.Equal(t, w.Code, http.StatusBadRequest)
@@ -97,7 +97,7 @@ func TestCreateStandardDeckShuffled(t *testing.T) {
 	router := setup()
 
 	w := httptest.NewRecorder()
-	req := httptest.NewRequest(http.MethodPost, "/decks?shuffled=true", nil)
+	req := httptest.NewRequest(http.MethodPost, "/deck/new?shuffled=true", nil)
 	router.ServeHTTP(w, req)
 
 	assert.Equal(t, w.Code, http.StatusOK)
@@ -119,7 +119,7 @@ func TestOpenDeck(t *testing.T) {
 	// 1. Create the deck through the Create endpoint. It will be stored (somewhere).
 	// Create a new standard deck using the Create Deck endpoint.
 	w := httptest.NewRecorder()
-	req := httptest.NewRequest(http.MethodPost, "/decks", nil)
+	req := httptest.NewRequest(http.MethodPost, "/deck/new", nil)
 	router.ServeHTTP(w, req)
 
 	require.Equal(t, w.Code, http.StatusOK)
@@ -133,7 +133,7 @@ func TestOpenDeck(t *testing.T) {
 
 	// 2. Open the (same) deck through Open endpoint.
 	w = httptest.NewRecorder()
-	req = httptest.NewRequest(http.MethodGet, fmt.Sprintf("/decks/%s", deckID), nil)
+	req = httptest.NewRequest(http.MethodGet, fmt.Sprintf("/deck/%s", deckID), nil)
 	router.ServeHTTP(w, req)
 
 	assert.Equal(t, w.Code, http.StatusOK)
@@ -160,7 +160,7 @@ func TestOpenPartialDeck(t *testing.T) {
 	}
 
 	w := httptest.NewRecorder()
-	req := httptest.NewRequest(http.MethodPost, "/decks?cards="+cardCodes, nil)
+	req := httptest.NewRequest(http.MethodPost, "/deck/new?cards="+cardCodes, nil)
 	router.ServeHTTP(w, req)
 
 	require.Equal(t, w.Code, http.StatusOK)
@@ -174,7 +174,7 @@ func TestOpenPartialDeck(t *testing.T) {
 
 	// 2. Open the (same) deck through Open endpoint.
 	w = httptest.NewRecorder()
-	req = httptest.NewRequest(http.MethodGet, fmt.Sprintf("/decks/%s", deckID), nil)
+	req = httptest.NewRequest(http.MethodGet, fmt.Sprintf("/deck/%s", deckID), nil)
 	router.ServeHTTP(w, req)
 
 	assert.Equal(t, w.Code, http.StatusOK)
@@ -238,7 +238,7 @@ func TestDrawCardHandler(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			target := fmt.Sprintf("/decks/%s/draw?count=%s", tc.deckID, tc.count)
+			target := fmt.Sprintf("/deck/%s/draw?count=%s", tc.deckID, tc.count)
 			req := httptest.NewRequest(http.MethodGet, target, nil)
 			w := httptest.NewRecorder()
 			router.ServeHTTP(w, req)
@@ -264,7 +264,7 @@ func TestDrawPartialDeck(t *testing.T) {
 
 	// Draw the first card: it should be the Queen of Hearts (QH).
 	w := httptest.NewRecorder()
-	req := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/decks/%s/draw?count=1", deckID), nil)
+	req := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/deck/%s/draw?count=1", deckID), nil)
 	router.ServeHTTP(w, req)
 	assert.Equal(t, http.StatusOK, w.Code)
 
@@ -277,7 +277,7 @@ func TestDrawPartialDeck(t *testing.T) {
 
 	// Draw a new card: it should be the 4 of Diamonds (4D).
 	w = httptest.NewRecorder()
-	req = httptest.NewRequest(http.MethodGet, fmt.Sprintf("/decks/%s/draw?count=1", deckID), nil)
+	req = httptest.NewRequest(http.MethodGet, fmt.Sprintf("/deck/%s/draw?count=1", deckID), nil)
 	router.ServeHTTP(w, req)
 	assert.Equal(t, http.StatusOK, w.Code)
 
@@ -289,7 +289,7 @@ func TestDrawPartialDeck(t *testing.T) {
 
 	// Draw the three last cards.
 	w = httptest.NewRecorder()
-	req = httptest.NewRequest(http.MethodGet, fmt.Sprintf("/decks/%s/draw?count=3", deckID), nil)
+	req = httptest.NewRequest(http.MethodGet, fmt.Sprintf("/deck/%s/draw?count=3", deckID), nil)
 	router.ServeHTTP(w, req)
 	assert.Equal(t, http.StatusOK, w.Code)
 
@@ -305,7 +305,7 @@ func TestDrawPartialDeck(t *testing.T) {
 
 func createTestDeck(router *gin.Engine, params string) uuid.UUID {
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest(http.MethodPost, "/decks"+params, nil)
+	req, _ := http.NewRequest(http.MethodPost, "/deck/new"+params, nil)
 	router.ServeHTTP(w, req)
 
 	var createResponse api.CreateDeckResponse
@@ -318,6 +318,8 @@ func createTestDeck(router *gin.Engine, params string) uuid.UUID {
 }
 
 // TODO: Some way to make this run before each test?
+//
+// Update: TestMain does not work because we need access to the router created by setup().
 func setup() *gin.Engine {
 	// Lightweight mode for testing.
 	gin.SetMode(gin.TestMode)
