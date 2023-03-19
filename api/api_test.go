@@ -20,10 +20,11 @@ func TestCreateDeckHandler(t *testing.T) {
 	router := setup()
 
 	// Perform a POST request to the /decks endpoint.
-	resp, err := http.Post(server.URL+"/decks", "application/json", nil)
-	assert.NoError(t, err)
+	w := httptest.NewRecorder()
+	req := httptest.NewRequest(http.MethodPost, "/decks", nil)
+	router.ServeHTTP(w, req)
 
-	assert.Equal(t, resp.StatusCode, http.StatusOK)
+	assert.Equal(t, w.Code, http.StatusOK)
 
 	// Decode the response body into a Deck.
 	var createdDeck api.CreateDeckResponse
@@ -40,9 +41,11 @@ func TestCreatePartialDeckEndpoint(t *testing.T) {
 	router := setup()
 
 	cards := "AS,KD,AC,2C,KH"
-	resp, err := http.Post(ts.URL+"/decks?cards="+cards, "", nil)
-	require.NoError(t, err)
-	require.Equal(t, http.StatusOK, resp.StatusCode)
+	w := httptest.NewRecorder()
+	req := httptest.NewRequest(http.MethodPost, "/decks?cards="+cards, nil)
+	router.ServeHTTP(w, req)
+
+	require.Equal(t, w.Code, http.StatusOK)
 
 	var createdDeck api.CreateDeckResponse
 	err = json.NewDecoder(resp.Body).Decode(&createdDeck)
@@ -82,14 +85,11 @@ func TestCreateDeckHandlerInvalidRequests(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			body := new(bytes.Buffer)
-			req, _ := http.NewRequest("POST", "/decks?cards="+tc.cardsParam, body)
-			req.Header.Set("Content-Type", "application/json")
-
 			w := httptest.NewRecorder()
+			req := httptest.NewRequest(http.MethodPost, "/decks?cards="+tc.cardsParam, nil)
 			router.ServeHTTP(w, req)
 
-			assert.Equal(t, http.StatusBadRequest, w.Code)
+			assert.Equal(t, w.Code, http.StatusBadRequest)
 		})
 	}
 }
@@ -98,10 +98,10 @@ func TestCreateStandardDeckShuffled(t *testing.T) {
 	router := setup()
 
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest("POST", "/decks?shuffled=true", nil)
+	req := httptest.NewRequest(http.MethodPost, "/decks?shuffled=true", nil)
 	router.ServeHTTP(w, req)
 
-	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Equal(t, w.Code, http.StatusOK)
 
 	var resp api.CreateDeckResponse
 	err := json.Unmarshal(w.Body.Bytes(), &resp)
@@ -120,10 +120,10 @@ func TestOpenDeck(t *testing.T) {
 	// 1. Create the deck through the Create endpoint. It will be stored (somewhere).
 	// Create a new standard deck using the Create Deck endpoint.
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest("POST", "/decks", nil)
+	req := httptest.NewRequest(http.MethodPost, "/decks", nil)
 	router.ServeHTTP(w, req)
 
-	require.Equal(t, http.StatusOK, w.Code)
+	require.Equal(t, w.Code, http.StatusOK)
 
 	var createResponse api.CreateDeckResponse
 	err := json.Unmarshal(w.Body.Bytes(), &createResponse)
@@ -134,10 +134,10 @@ func TestOpenDeck(t *testing.T) {
 
 	// 2. Open the (same) deck through Open endpoint.
 	w = httptest.NewRecorder()
-	req, _ = http.NewRequest("GET", fmt.Sprintf("/decks/%s", deckID), nil)
+	req = httptest.NewRequest(http.MethodGet, fmt.Sprintf("/decks/%s", deckID), nil)
 	router.ServeHTTP(w, req)
 
-	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Equal(t, w.Code, http.StatusOK)
 
 	var openResponse api.OpenDeckResponse
 	err = json.Unmarshal(w.Body.Bytes(), &openResponse)
@@ -161,10 +161,10 @@ func TestOpenPartialDeck(t *testing.T) {
 	}
 
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest("POST", "/decks?cards="+cardCodes, nil)
+	req := httptest.NewRequest(http.MethodPost, "/decks?cards="+cardCodes, nil)
 	router.ServeHTTP(w, req)
 
-	require.Equal(t, http.StatusOK, w.Code)
+	require.Equal(t, w.Code, http.StatusOK)
 
 	var createResponse api.CreateDeckResponse
 	err := json.Unmarshal(w.Body.Bytes(), &createResponse)
@@ -175,10 +175,10 @@ func TestOpenPartialDeck(t *testing.T) {
 
 	// 2. Open the (same) deck through Open endpoint.
 	w = httptest.NewRecorder()
-	req, _ = http.NewRequest("GET", fmt.Sprintf("/decks/%s", deckID), nil)
+	req = httptest.NewRequest(http.MethodGet, fmt.Sprintf("/decks/%s", deckID), nil)
 	router.ServeHTTP(w, req)
 
-	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Equal(t, w.Code, http.StatusOK)
 
 	var openResponse api.OpenDeckResponse
 	err = json.Unmarshal(w.Body.Bytes(), &openResponse)
@@ -254,21 +254,14 @@ func TestDrawCardHandler(t *testing.T) {
 		},
 	}
 
-	// Test the drawCardHandler
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			// Create a request with the test data
-			req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("/decks/%s/draw?count=%s", tc.deckID, tc.count), nil)
-			if err != nil {
-				t.Fatalf("Failed to create request: %v", err)
-			}
+			target := fmt.Sprintf("/decks/%s/draw?count=%s", tc.deckID, tc.count)
+			req := httptest.NewRequest(http.MethodGet, target, nil)
+			w := httptest.NewRecorder()
+			router.ServeHTTP(w, req)
 
-			// Execute the request and record the response
-			rr := httptest.NewRecorder()
-			router.ServeHTTP(rr, req)
-
-			// Use assert to check if the expected code matches the actual code
-			assert.Equal(t, tc.expectedCode, rr.Code, "Expected status code to match")
+			assert.Equal(t, w.Code, tc.expectedCode, "Expected status code to match")
 		})
 	}
 }
@@ -289,7 +282,7 @@ func TestDrawPartialDeck(t *testing.T) {
 
 	// Draw the first card: it should be the Queen of Hearts (QH).
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest("GET", fmt.Sprintf("/decks/%s/draw?count=1", deckID), nil)
+	req := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/decks/%s/draw?count=1", deckID), nil)
 	router.ServeHTTP(w, req)
 	assert.Equal(t, http.StatusOK, w.Code)
 
@@ -300,8 +293,8 @@ func TestDrawPartialDeck(t *testing.T) {
 	assert.Equal(t, drawnCards[0], expectedCards[0], "Card drawn is the first in the deck.")
 
 	// Draw a new card: it should be the 4 of Diamonds (4D).
-	req, _ = http.NewRequest("GET", fmt.Sprintf("/decks/%s/draw?count=1", deckID), nil)
 	w = httptest.NewRecorder()
+	req = httptest.NewRequest(http.MethodGet, fmt.Sprintf("/decks/%s/draw?count=1", deckID), nil)
 	router.ServeHTTP(w, req)
 	assert.Equal(t, http.StatusOK, w.Code)
 
@@ -311,8 +304,8 @@ func TestDrawPartialDeck(t *testing.T) {
 	assert.Equal(t, drawnCards[0], expectedCards[1], "Card drawn is the (currently) first in the deck.")
 
 	// Draw the three last cards.
-	req, _ = http.NewRequest("GET", fmt.Sprintf("/decks/%s/draw?count=3", deckID), nil)
 	w = httptest.NewRecorder()
+	req = httptest.NewRequest(http.MethodGet, fmt.Sprintf("/decks/%s/draw?count=3", deckID), nil)
 	router.ServeHTTP(w, req)
 	assert.Equal(t, http.StatusOK, w.Code)
 
