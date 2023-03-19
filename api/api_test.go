@@ -196,43 +196,40 @@ func TestOpenPartialDeck(t *testing.T) {
 func TestDrawCardHandler(t *testing.T) {
 	router := setup()
 
-	// Define test cases
-	type testCase struct {
+	validID := createTestDeck(router, "").String()
+
+	testCases := []struct {
 		name         string
 		deckID       string
 		count        string
 		expectedCode int
-	}
-
-	validID := createTestDeck(router, "").String()
-
-	testCases := []testCase{
+	}{
 		{
-			name:         "Invalid deck ID",
+			name:         "invalid deck ID",
 			deckID:       "invalid-deck-id",
 			count:        "5",
 			expectedCode: http.StatusBadRequest,
 		},
 		{
-			name:         "No count parameter provided",
+			name:         "no count parameter provided",
 			deckID:       validID,
 			count:        "",
 			expectedCode: http.StatusBadRequest,
 		},
 		{
-			name:         "Invalid count parameter",
+			name:         "invalid count parameter",
 			deckID:       validID,
 			count:        "invalid-count",
 			expectedCode: http.StatusBadRequest,
 		},
 		{
-			name:         "Non-positive count parameter",
+			name:         "non-positive count parameter",
 			deckID:       validID,
 			count:        "-5",
 			expectedCode: http.StatusBadRequest,
 		},
 		{
-			name:         "Deck not found",
+			name:         "deck not found",
 			deckID:       uuid.NewString(),
 			count:        "5",
 			expectedCode: http.StatusBadRequest,
