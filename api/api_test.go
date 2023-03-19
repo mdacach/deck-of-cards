@@ -294,6 +294,8 @@ func TestDrawPartialDeck(t *testing.T) {
 	assert.Equal(t, http.StatusOK, w.Code)
 
 	err = json.NewDecoder(w.Body).Decode(&drawResponse)
+	assert.NoError(t, err)
+
 	drawnCards = drawResponse.Cards
 	assert.Equal(t, len(drawnCards), 3, "Three cards are drawn.")
 	assert.Equal(t, drawnCards[0], expectedCards[2], "Card drawn is the (currently) first in the deck.")
