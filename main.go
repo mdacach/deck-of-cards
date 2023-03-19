@@ -13,6 +13,7 @@ package main
 import (
 	"deck_of_cards/api"
 	"deck_of_cards/deck"
+	"fmt"
 )
 
 func main() {
@@ -20,4 +21,13 @@ func main() {
 	api.DeckStore = deck.NewStore()
 	r := api.SetupRouter()
 	r.Run(":8080")
+	router := api.SetupRouter()
+
+	// TODO: Get port to run from flag/env variable
+	err := router.Run(":8080")
+	if err != nil {
+		// TODO: Better error handling.
+		fmt.Println("Could not start Gin server. Maybe port :8080 is already being used?")
+		return
+	}
 }
