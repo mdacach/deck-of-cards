@@ -32,10 +32,9 @@ func FromString(s string) (Card, error) {
 		return Card{}, errors.New("invalid card string")
 	}
 
-	// The suit should come always last, and have always length one.
-	// So we can split the string into the rank and suit portions accordingly.
-	rankStr := s[:len(s)-1]
-	suitStr := s[len(s)-1:]
+	// Code is Rank (one char) followed by Suit (one char).
+	rankStr := s[0]
+	suitStr := s[1]
 
 	// Up until here, we do not know if the rank and suit are valid strings.
 	// So we need to validate them.
@@ -44,11 +43,11 @@ func FromString(s string) (Card, error) {
 	suit := Suit(suitStr)
 
 	if !rank.IsValid() {
-		return Card{}, fmt.Errorf("invalid rank string: %s", rankStr)
+		return Card{}, fmt.Errorf("invalid rank string: %c", rankStr)
 	}
 
 	if !suit.IsValid() {
-		return Card{}, fmt.Errorf("invalid suit string: %s", suitStr)
+		return Card{}, fmt.Errorf("invalid suit string: %c", suitStr)
 	}
 
 	return Card{Rank: rank, Suit: suit}, nil

@@ -14,7 +14,7 @@ func TestCardString(t *testing.T) {
 		expected string
 	}{
 		{"Ace of Spades -> AS", Card{Suit: Spades, Rank: Ace}, "AS"},
-		{"Ten of Hearts -> 10H", Card{Suit: Hearts, Rank: Ten}, "10H"},
+		{"Ten of Hearts -> TH", Card{Suit: Hearts, Rank: Ten}, "TH"},
 		{"Queen of Diamonds -> QD", Card{Suit: Diamonds, Rank: Queen}, "QD"},
 		{"Jack of Clubs -> JC", Card{Suit: Clubs, Rank: Jack}, "JC"},
 	}
@@ -38,7 +38,7 @@ func TestCardFromStringValid(t *testing.T) {
 		{"5H -> Five of Hearts", "5H", Card{Rank: Five, Suit: Hearts}},
 		{"9C -> Nine of Clubs", "9C", Card{Rank: Nine, Suit: Clubs}},
 		{"2S -> Two of Spades", "2S", Card{Rank: Two, Suit: Spades}},
-		{"10S -> Ten of Spades", "10S", Card{Rank: Ten, Suit: Spades}},
+		{"TS -> Ten of Spades", "TS", Card{Rank: Ten, Suit: Spades}},
 	}
 
 	for _, tc := range testCases {
@@ -86,7 +86,7 @@ func TestCardMarshalJSON(t *testing.T) {
 	}{
 		{"Queen of Hearts", Card{Rank: Queen, Suit: Hearts}, `{"value":"QUEEN","suit":"HEARTS","code":"QH"}`},
 		{"Ace of Spades", Card{Rank: Ace, Suit: Spades}, `{"value":"ACE","suit":"SPADES","code":"AS"}`},
-		{"Ten of Spades", Card{Rank: Ten, Suit: Spades}, `{"value":"TEN","suit":"SPADES","code":"10S"}`},
+		{"Ten of Spades", Card{Rank: Ten, Suit: Spades}, `{"value":"TEN","suit":"SPADES","code":"TS"}`},
 	}
 
 	for _, tc := range testCases {
