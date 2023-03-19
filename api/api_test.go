@@ -193,20 +193,6 @@ func TestOpenPartialDeck(t *testing.T) {
 	}
 }
 
-func createTestDeck(router *gin.Engine, params string) uuid.UUID {
-	w := httptest.NewRecorder()
-	req, _ := http.NewRequest("POST", "/decks"+params, nil)
-	router.ServeHTTP(w, req)
-
-	var createResponse api.CreateDeckResponse
-	// This should never fail.
-	_ = json.Unmarshal(w.Body.Bytes(), &createResponse)
-
-	deckID := createResponse.DeckID
-
-	return deckID
-}
-
 func TestDrawCardHandler(t *testing.T) {
 	router := setup()
 
@@ -316,6 +302,20 @@ func TestDrawPartialDeck(t *testing.T) {
 	assert.Equal(t, drawnCards[0], expectedCards[2], "Card drawn is the (currently) first in the deck.")
 	assert.Equal(t, drawnCards[1], expectedCards[3], "Next card drawn is the (currently) first in the deck.")
 	assert.Equal(t, drawnCards[2], expectedCards[4], "Next card drawn is the (currently) first in the deck.")
+}
+
+func createTestDeck(router *gin.Engine, params string) uuid.UUID {
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest(http.MethodPost, "/decks"+params, nil)
+	router.ServeHTTP(w, req)
+
+	var createResponse api.CreateDeckResponse
+	// This should never fail.
+	_ = json.Unmarshal(w.Body.Bytes(), &createResponse)
+
+	deckID := createResponse.DeckID
+
+	return deckID
 }
 
 // TODO: Some way to make this run before each test?
