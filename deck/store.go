@@ -35,6 +35,10 @@ func NewStore() *Store {
 
 // Add adds a new deck to the store. It returns an error if a deck with the same ID already exists in the store.
 func (s *Store) Add(deck *Deck) error {
+	if deck == nil {
+		return errors.New("deck pointer can not be nil")
+	}
+
 	s.mu.Lock()
 	// From Go 1.14 we don't need to worry about performance of defer here.
 	// Source: https: //www.reddit.com/r/golang/comments/fdy6sb/comment/fjl6d37/?utm_source=share&utm_medium=web2x&context=3

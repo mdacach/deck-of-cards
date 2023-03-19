@@ -41,6 +41,29 @@ func TestStoreAddMultipleDecks(t *testing.T) {
 	}
 }
 
+func TestStoreAddDeckWithDuplicateID(t *testing.T) {
+	store := NewStore()
+
+	deck1 := NewStandardDeck()
+	deck2 := NewStandardDeck()
+
+	// Set the ID of deck2 to be the same as deck1
+	deck2.ID = deck1.ID
+
+	err := store.Add(&deck1)
+	require.NoError(t, err)
+
+	err = store.Add(&deck2)
+	assert.Error(t, err, "Adding a deck with a duplicate ID should return an error")
+}
+
+func TestStoreAddNilDeck(t *testing.T) {
+	store := NewStore()
+
+	err := store.Add(nil)
+	assert.Error(t, err, "Adding a nil deck should return an error")
+}
+
 func TestStoreGetNonExistentDeck(t *testing.T) {
 	store := NewStore()
 
