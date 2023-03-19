@@ -1,7 +1,6 @@
 package api_test
 
 import (
-	"bytes"
 	"deck_of_cards/api"
 	"deck_of_cards/card"
 	"deck_of_cards/deck"
@@ -26,9 +25,9 @@ func TestCreateDeckHandler(t *testing.T) {
 
 	assert.Equal(t, w.Code, http.StatusOK)
 
-	// Decode the response body into a Deck.
+	// Decode the response body.
 	var createdDeck api.CreateDeckResponse
-	err = json.NewDecoder(resp.Body).Decode(&createdDeck)
+	err := json.NewDecoder(w.Body).Decode(&createdDeck)
 	assert.NoError(t, err)
 
 	// Assert that the created deck has the expected number of cards.
@@ -48,7 +47,7 @@ func TestCreatePartialDeckEndpoint(t *testing.T) {
 	require.Equal(t, w.Code, http.StatusOK)
 
 	var createdDeck api.CreateDeckResponse
-	err = json.NewDecoder(resp.Body).Decode(&createdDeck)
+	err := json.NewDecoder(w.Body).Decode(&createdDeck)
 	require.NoError(t, err)
 
 	expectedCards := []card.Card{
@@ -104,7 +103,7 @@ func TestCreateStandardDeckShuffled(t *testing.T) {
 	assert.Equal(t, w.Code, http.StatusOK)
 
 	var resp api.CreateDeckResponse
-	err := json.Unmarshal(w.Body.Bytes(), &resp)
+	err := json.NewDecoder(w.Body).Decode(&resp)
 	assert.NoError(t, err)
 
 	// From CreateDeckResponse we do not have access to the cards directly,
@@ -126,7 +125,7 @@ func TestOpenDeck(t *testing.T) {
 	require.Equal(t, w.Code, http.StatusOK)
 
 	var createResponse api.CreateDeckResponse
-	err := json.Unmarshal(w.Body.Bytes(), &createResponse)
+	err := json.NewDecoder(w.Body).Decode(&createResponse)
 	require.NoError(t, err)
 
 	// Keep track of the deck's ID.
@@ -140,7 +139,7 @@ func TestOpenDeck(t *testing.T) {
 	assert.Equal(t, w.Code, http.StatusOK)
 
 	var openResponse api.OpenDeckResponse
-	err = json.Unmarshal(w.Body.Bytes(), &openResponse)
+	err = json.NewDecoder(w.Body).Decode(&openResponse)
 	require.NoError(t, err)
 
 	assert.Equal(t, deckID, openResponse.DeckID, "Deck ID does not change after it is created.")
@@ -167,7 +166,7 @@ func TestOpenPartialDeck(t *testing.T) {
 	require.Equal(t, w.Code, http.StatusOK)
 
 	var createResponse api.CreateDeckResponse
-	err := json.Unmarshal(w.Body.Bytes(), &createResponse)
+	err := json.NewDecoder(w.Body).Decode(&createResponse)
 	require.NoError(t, err)
 
 	// Keep track of the deck's ID.
@@ -181,7 +180,7 @@ func TestOpenPartialDeck(t *testing.T) {
 	assert.Equal(t, w.Code, http.StatusOK)
 
 	var openResponse api.OpenDeckResponse
-	err = json.Unmarshal(w.Body.Bytes(), &openResponse)
+	err = json.NewDecoder(w.Body).Decode(&openResponse)
 	require.NoError(t, err)
 
 	assert.Equal(t, deckID, openResponse.DeckID, "Deck ID does not change after it is created.")
@@ -287,7 +286,8 @@ func TestDrawPartialDeck(t *testing.T) {
 	assert.Equal(t, http.StatusOK, w.Code)
 
 	var drawResponse api.DrawCardsResponse
-	_ = json.Unmarshal(w.Body.Bytes(), &drawResponse)
+	err := json.NewDecoder(w.Body).Decode(&drawResponse)
+	assert.NoError(t, err)
 	drawnCards := drawResponse.Cards
 	assert.Equal(t, len(drawnCards), 1, "One card is drawn.")
 	assert.Equal(t, drawnCards[0], expectedCards[0], "Card drawn is the first in the deck.")
@@ -298,7 +298,8 @@ func TestDrawPartialDeck(t *testing.T) {
 	router.ServeHTTP(w, req)
 	assert.Equal(t, http.StatusOK, w.Code)
 
-	_ = json.Unmarshal(w.Body.Bytes(), &drawResponse)
+	err = json.NewDecoder(w.Body).Decode(&drawResponse)
+	assert.NoError(t, err)
 	drawnCards = drawResponse.Cards
 	assert.Equal(t, len(drawnCards), 1, "One card is drawn.")
 	assert.Equal(t, drawnCards[0], expectedCards[1], "Card drawn is the (currently) first in the deck.")
@@ -309,7 +310,7 @@ func TestDrawPartialDeck(t *testing.T) {
 	router.ServeHTTP(w, req)
 	assert.Equal(t, http.StatusOK, w.Code)
 
-	_ = json.Unmarshal(w.Body.Bytes(), &drawResponse)
+	err = json.NewDecoder(w.Body).Decode(&drawResponse)
 	drawnCards = drawResponse.Cards
 	assert.Equal(t, len(drawnCards), 3, "Three cards are drawn.")
 	assert.Equal(t, drawnCards[0], expectedCards[2], "Card drawn is the (currently) first in the deck.")
