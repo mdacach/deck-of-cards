@@ -63,7 +63,7 @@ The package also defines the required request and response structures for each e
 1. A user creates a standard deck of cards and shuffles it:
 
    ```console
-   POST /decks?shuffled=true
+   POST /deck/new?shuffled=true
    ```
 
    By default the deck is un-shuffled.
