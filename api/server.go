@@ -1,3 +1,7 @@
+// Package api provides the HTTP API for working with decks of playing cards.
+// It uses the Gin web framework to handle HTTP requests and the `deck` and `card`
+// packages to create and manage decks of cards. The package exposes endpoints
+// for creating decks, opening decks, and drawing cards from decks.
 package api
 
 import (
