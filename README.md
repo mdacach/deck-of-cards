@@ -286,6 +286,8 @@ if no `make` available.
 
 </details>
 
+## [Video Example](https://www.dropbox.com/s/6l5jqpw9s5p2oqa/deck-of-card-usage.mkv?dl=0)
+
 ## Possible Improvements
 
 ### Choose port to run
