@@ -16,5 +16,8 @@ test:
 test-json:
 	go test -json ./...
 
+test-list:
+	go test ./... -list=.
+
 lint:
 	golangci-lint run
