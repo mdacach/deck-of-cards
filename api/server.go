@@ -5,7 +5,7 @@
 package api
 
 import (
-	"deck_of_cards/deck"
+	"deck-of-cards/deck"
 	"github.com/gin-gonic/gin"
 )
 

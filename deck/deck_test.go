@@ -1,7 +1,7 @@
 package deck
 
 import (
-	"deck_of_cards/card"
+	"deck-of-cards/card"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"testing"

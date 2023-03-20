@@ -1,7 +1,7 @@
 package api
 
 import (
-	"deck_of_cards/card"
+	"deck-of-cards/card"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"net/http"

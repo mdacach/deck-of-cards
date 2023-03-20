@@ -11,7 +11,7 @@
 package deck
 
 import (
-	"deck_of_cards/card"
+	"deck-of-cards/card"
 	"errors"
 	"fmt"
 	"github.com/google/uuid"

@@ -1,7 +1,7 @@
 package api
 
 import (
-	"deck_of_cards/card"
+	"deck-of-cards/card"
 	"encoding/json"
 	"fmt"
 	"github.com/stretchr/testify/assert"

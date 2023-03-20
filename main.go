@@ -11,7 +11,7 @@
 package main
 
 import (
-	"deck_of_cards/api"
+	"deck-of-cards/api"
 	"fmt"
 	"github.com/gin-gonic/gin"
 )
