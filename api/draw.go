@@ -38,6 +38,7 @@ func (server *Server) drawCardHandler(c *gin.Context) {
 	drawnCards, err := deckRetrieved.Draw(count)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
 	}
 
 	jsonResponse := DrawCardsResponse{
