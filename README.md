@@ -54,7 +54,7 @@ following endpoints:
 
 1. `POST /deck/new`: Create a new deck (full or partial) with optional shuffling.
 2. `GET /deck/:deck_id`: Retrieve information about (open) a deck.
-3. `GET /deck/:deck_id/draw`: Draw a specified number of cards from a deck.
+3. `POST /deck/:deck_id/draw`: Draw a specified number of cards from a deck.
 
 The package also defines the required request and response structures for each endpoint.
 
@@ -83,7 +83,7 @@ The package also defines the required request and response structures for each e
 4. A user draws three cards from a deck:
 
    ```console
-   GET /deck/123e4567-e89b-12d3-a456-426655440000/draw?count=3
+   POST /deck/123e4567-e89b-12d3-a456-426655440000/draw?count=3
    ```
 
 ## Example Usage
