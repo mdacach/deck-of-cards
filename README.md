@@ -90,10 +90,10 @@ The package also defines the required request and response structures for each e
 
 ### Start the Server
 
-By default, the server runs on port :8080. TODO: change with a flag.
+The server runs on port :8080.
 
 ```shell
-go run .
+make server
 ```
 
 1. ### Partial Shuffled Deck
@@ -274,3 +274,56 @@ go run .
    ```
 
 </details>
+
+## Possible Improvements
+
+### Data Persistence
+
+We store the decks in-memory, through a Map + Mutex.
+This means that if the server shuts down, every thing is lost.
+We could implement data persistence by using a database.
+A NoSQL database could be a good fit, as we won't need to perform
+SQL-like queries, and the data does not follow a table-like structure.
+
+### Require authorization for opening decks
+
+Opening the deck exposes all the cards, in-order. If a user was able to inspect the deck,
+they would know which cards to expect when drawing.
+
+### Continuous Integration
+
+For a bigger team, it would be nice to automatically reject a code change if tests do not pass.
+
+### Containerize
+
+We could make the project easier to run and develop by using Docker.
+
+### Property-based testing
+
+Some of the tests (such as CardFromString) could be improved by
+using [Property-based testing](https://earthly.dev/blog/property-based-testing/).
+
+### Idempotency of create
+
+User may try to create the same deck multiple times (maybe they click at the create button too many times).
+We would treat each request as different, and create multiple decks.
+
+### Better error handling
+
+Error handling could be improved by providing custom error types.
+
+### Less memory usage
+
+In order to better mimic the JSON responses, we store all the cards individually inside a deck.
+The `deck` type contain an array of cards (with rank, suit and code). This is not necessary, because we only
+have 52 different types of cards, and they do not change internally. We could improve the memory usage by referring
+to the cards, instead of storing the cards. (e.g. store a []int inside Deck, where each integer corresponds to a card (
+from 1 to 52)).
+
+### Type-Driven Development
+
+Let's consider `Rank` for example. Rank is a length-one string ("A" for Ace, "K" for King).
+But there's no validation for creating a Rank. It is allowed to create a Rank("Some String"), and the compiler will not
+complain.
+[Newtype](https://www.reddit.com/r/golang/comments/kmj640/newtypes_constructing_and_validation/?utm_source=share&utm_medium=web2x&context=3)
+pattern could be useful for solving this problem.
