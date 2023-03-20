@@ -12,13 +12,13 @@ import (
 func (server *Server) openDeckHandler(c *gin.Context) {
 	deckID, err := uuid.Parse(c.Param("deck_id"))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Deck ID is not valid."})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "deck ID is not valid."})
 		return
 	}
 
 	deckRetrieved, notFound := server.store.Get(deckID)
 	if notFound != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Deck not found. Are you sure deck_id is correct?"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "deck not found. Are you sure deck_id is correct?"})
 		return
 	}
 
