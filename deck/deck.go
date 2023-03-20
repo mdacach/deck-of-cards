@@ -90,7 +90,7 @@ func NewPartialDeck(codes []string) (Deck, error) {
 // There is no need to have shuffle functionality inside of creating the deck.
 // We can first create the deck, then shuffle it (if needed).
 func (d *Deck) Shuffle() {
-	// TODO: Handle the seed value here. We want to be careful here.
+	// TODO: We probably want to set some secure seed here.
 	//       Do not let clients know how the deck is shuffled!
 	numberCards := len(d.Cards)
 	rand.Shuffle(numberCards, func(i, j int) {
@@ -115,11 +115,11 @@ func (d *Deck) Draw(count int) ([]card.Card, error) {
 	drawnCards := make([]card.Card, count)
 	copy(drawnCards, d.Cards[:count]) // We don't want to mutate d.Cards from drawnCards.
 
-	// TODO: Write about this.
-	//       Here it's not a very big deal to keep resizing the array (because it's small, at most 52 items)
-	//       But in another context, we could think about optimizing this: for example, we can keep the array
-	//       the same, and keep track of how many cards we have removed until now. Then the "first" card of the
-	//       array will actually be at the index `cardsRemoved`.
+	// We chose to represent the first values of the array as the first cards to be drawn.
+	// This means we need to resize the array, which could potentially be costly.
+	// In this case, it's not a big problem because the size of the array is small (there are at most 52 cards).
+	// But in another setting, we could investigate how to do this more efficiently, by using another data structure,
+	// or handling removing in a different way.
 	d.Cards = d.Cards[count:]
 	d.Remaining -= count
 
