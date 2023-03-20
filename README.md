@@ -96,96 +96,181 @@ By default, the server runs on port :8080. TODO: change with a flag.
 go run .
 ```
 
-### Create a partial shuffled Deck
-```shell
-curl --request POST \
-  --url 'http://localhost:8080/deck/new?cards=AS,KD,AC,2C,KH&shuffled=true'
-```
+1. ### Partial Shuffled Deck
+   #### Create a partial shuffled Deck
+   ```shell
+   curl --request POST \
+     --url 'http://localhost:8080/deck/new?cards=AS,KD,AC,2C,KH&shuffled=true'
+   ```
 
-<details>
-<summary>Example Output</summary>
+   <details>
+   <summary>Example Output</summary>
 
-```json
-{
-   "deck_id":"31ef40c2-5825-491c-b5c6-68e385717427",
-   "shuffled":true,
-   "remaining":5
-}
-```
+   ```json
+   {
+      "deck_id":"31ef40c2-5825-491c-b5c6-68e385717427",
+      "shuffled":true,
+      "remaining":5
+   }
+   ```
 
-</details>
+   </details>
 
-### Open the deck
-```shell
-curl --request GET \
-  --url http://localhost:8080/deck/31ef40c2-5825-491c-b5c6-68e385717427
-```
+   #### Open the deck
+   ```shell
+   curl --request GET \
+     --url 'http://localhost:8080/deck/31ef40c2-5825-491c-b5c6-68e385717427'
+   ```
 
-<details>
-<summary>Example Output</summary>
+   <details>
+   <summary>Example Output</summary>
 
-```json
-{
-   "deck_id":"31ef40c2-5825-491c-b5c6-68e385717427",
-   "shuffled":true,
-   "remaining":5,
-   "cards": [
-      {
-         "value":"KING",
-         "suit":"DIAMONDS",
-         "code":"KD"},
-      {
-         "value":"KING",
-         "suit":"HEARTS",
-         "code":"KH"},
-      {
-         "value":"ACE",
-         "suit":"SPADES",
-         "code":"AS"},
-      {
-         "value":"TWO",
-         "suit":"CLUBS",
-         "code":"2C"},
-      {
-         "value":"ACE",
-         "suit":"CLUBS",
-         "code":"AC"
-      }
-   ]
-}
-```
+   ```json
+   {
+      "deck_id":"31ef40c2-5825-491c-b5c6-68e385717427",
+      "shuffled":true,
+      "remaining":5,
+      "cards": [
+         {
+            "value":"KING",
+            "suit":"DIAMONDS",
+            "code":"KD"},
+         {
+            "value":"KING",
+            "suit":"HEARTS",
+            "code":"KH"},
+         {
+            "value":"ACE",
+            "suit":"SPADES",
+            "code":"AS"},
+         {
+            "value":"TWO",
+            "suit":"CLUBS",
+            "code":"2C"},
+         {
+            "value":"ACE",
+            "suit":"CLUBS",
+            "code":"AC"
+         }
+      ]
+   }
+   ```
 
-</details>
+   </details>
 
-### Draw three cards
-```shell
-curl --request POST \
-  --url http://localhost:8080/deck/31ef40c2-5825-491c-b5c6-68e385717427/draw?count=3
-```
+   #### Draw three cards
+   ```shell
+   curl --request POST \
+     --url 'http://localhost:8080/deck/31ef40c2-5825-491c-b5c6-68e385717427/draw?count=3'
+   ```
 
-<details>
-<summary>Example Output</summary>
+   <details>
+   <summary>Example Output</summary>
 
-```json
-{
-   "cards": [
-      {
-         "value":"KING",
-         "suit":"DIAMONDS",
-         "code":"KD"
-      },
-      {
-         "value":"KING",
-         "suit":"HEARTS",
-         "code":"KH"
-      },
-      {
-         "value":"ACE",
-         "suit":"SPADES",
-         "code":"AS"
-      }
-   ]
-}
-```
+   ```json
+   {
+      "cards": [
+         {
+            "value":"KING",
+            "suit":"DIAMONDS",
+            "code":"KD"
+         },
+         {
+            "value":"KING",
+            "suit":"HEARTS",
+            "code":"KH"
+         },
+         {
+            "value":"ACE",
+            "suit":"SPADES",
+            "code":"AS"
+         }
+      ]
+   }
+   ```
+
+   </details>
+2. ### Poker Hand
+   #### Create standard deck
+   ```shell
+   curl --request POST \
+     --url 'http://localhost:8080/deck/new?shuffled=true'
+   ```
+
+   <details>
+   <summary>Example Output</summary>
+
+   ```json
+   {
+      "deck_id":"9c604247-f9f2-4bd3-8354-00c30463ec37",
+      "shuffled":true,
+      "remaining":52
+   }
+   ```
+
+   </details>
+
+   #### Draw hand
+   ```shell
+   curl --request POST \
+     --url 'http://localhost:8080/deck/9c604247-f9f2-4bd3-8354-00c30463ec37/draw?count=2'
+   ```
+
+   <details>
+   <summary>Example Output</summary>
+   Ts6c is not a good hand... There are some chances at a straight though, let's see the flop.
+
+   ```json
+   {
+      "cards": [
+         {
+            "value":"TEN",
+            "suit":"SPADES",
+            "code":"TS"
+         },
+         {
+            "value":"SIX",
+            "suit":"CLUBS",
+            "code":"6C"
+         }
+      ]
+   }
+   ```
+
+   </details>
+
+   #### Draw the flop
+   ```shell
+   curl --request POST \
+     --url 'http://localhost:8080/deck/9c604247-f9f2-4bd3-8354-00c30463ec37/draw?count=3'
+   ```
+
+   <details>
+   <summary>Example Output</summary>
+   We do have a shot at a straight (if any 7 comes)...  
+   But it's not really enough to continue.  
+   Let's fold here.
+
+   ```json
+   {
+      "cards": [
+         {
+            "value":"EIGHT",
+            "suit":"CLUBS",
+            "code":"8C"
+         },
+         {
+            "value":"NINE",
+            "suit":"CLUBS",
+            "code":"9C"
+         },
+         {
+            "value":"KING",
+            "suit":"DIAMONDS",
+            "code":"KD"
+         }
+      ]
+   }
+   ```
 
 </details>
