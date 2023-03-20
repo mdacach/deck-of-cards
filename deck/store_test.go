@@ -12,7 +12,6 @@ import (
 // `Store` is just a thin layer wrapping a `map`, and we can rely on `map` working correctly.
 // The tests here would be useful if we were to implement multiple versions of a `Store` later, such
 // as one using Redis.
-// TODO: Think about adding a concurrent use test.
 
 func TestStoreAddDeck(t *testing.T) {
 	store := NewStore()
