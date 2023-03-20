@@ -239,7 +239,7 @@ func TestDrawCardHandler(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			target := fmt.Sprintf("/deck/%s/draw?count=%s", tc.deckID, tc.count)
-			req := httptest.NewRequest(http.MethodGet, target, nil)
+			req := httptest.NewRequest(http.MethodPost, target, nil)
 			w := httptest.NewRecorder()
 			router.ServeHTTP(w, req)
 
@@ -264,7 +264,7 @@ func TestDrawPartialDeck(t *testing.T) {
 
 	// Draw the first card: it should be the Queen of Hearts (QH).
 	w := httptest.NewRecorder()
-	req := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/deck/%s/draw?count=1", deckID), nil)
+	req := httptest.NewRequest(http.MethodPost, fmt.Sprintf("/deck/%s/draw?count=1", deckID), nil)
 	router.ServeHTTP(w, req)
 	assert.Equal(t, http.StatusOK, w.Code)
 
@@ -277,7 +277,7 @@ func TestDrawPartialDeck(t *testing.T) {
 
 	// Draw a new card: it should be the 4 of Diamonds (4D).
 	w = httptest.NewRecorder()
-	req = httptest.NewRequest(http.MethodGet, fmt.Sprintf("/deck/%s/draw?count=1", deckID), nil)
+	req = httptest.NewRequest(http.MethodPost, fmt.Sprintf("/deck/%s/draw?count=1", deckID), nil)
 	router.ServeHTTP(w, req)
 	assert.Equal(t, http.StatusOK, w.Code)
 
@@ -289,7 +289,7 @@ func TestDrawPartialDeck(t *testing.T) {
 
 	// Draw the three last cards.
 	w = httptest.NewRecorder()
-	req = httptest.NewRequest(http.MethodGet, fmt.Sprintf("/deck/%s/draw?count=3", deckID), nil)
+	req = httptest.NewRequest(http.MethodPost, fmt.Sprintf("/deck/%s/draw?count=3", deckID), nil)
 	router.ServeHTTP(w, req)
 	assert.Equal(t, http.StatusOK, w.Code)
 

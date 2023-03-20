@@ -23,7 +23,7 @@ func SetupRouter() *gin.Engine {
 
 	r.POST("/deck/new", createDeckHandler)
 	r.GET("/deck/:deck_id", openDeckHandler)
-	r.GET("/deck/:deck_id/draw", drawCardHandler)
+	r.POST("/deck/:deck_id/draw", drawCardHandler)
 
 	return r
 }
