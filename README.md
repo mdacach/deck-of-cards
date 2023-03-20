@@ -298,6 +298,9 @@ complex queries.
 Opening the deck exposes all the cards, in-order. If a user was able to inspect the deck,
 they would know which cards to expect when drawing.
 
+### Better logging
+Gin already provides some logging, but we are not logging anything else.
+
 ### Continuous Integration
 
 For a bigger team, it would be nice to automatically reject a code change if tests do not pass.
