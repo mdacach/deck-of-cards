@@ -85,3 +85,107 @@ The package also defines the required request and response structures for each e
    ```console
    GET /deck/123e4567-e89b-12d3-a456-426655440000/draw?count=3
    ```
+
+## Example Usage
+
+### Start the Server
+
+By default, the server runs on port :8080. TODO: change with a flag.
+
+```shell
+go run .
+```
+
+### Create a partial shuffled Deck
+```shell
+curl --request POST \
+  --url 'http://localhost:8080/deck/new?cards=AS,KD,AC,2C,KH&shuffled=true'
+```
+
+<details>
+<summary>Example Output</summary>
+
+```json
+{
+   "deck_id":"31ef40c2-5825-491c-b5c6-68e385717427",
+   "shuffled":true,
+   "remaining":5
+}
+```
+
+</details>
+
+### Open the deck
+```shell
+curl --request GET \
+  --url http://localhost:8080/deck/31ef40c2-5825-491c-b5c6-68e385717427
+```
+
+<details>
+<summary>Example Output</summary>
+
+```json
+{
+   "deck_id":"31ef40c2-5825-491c-b5c6-68e385717427",
+   "shuffled":true,
+   "remaining":5,
+   "cards": [
+      {
+         "value":"KING",
+         "suit":"DIAMONDS",
+         "code":"KD"},
+      {
+         "value":"KING",
+         "suit":"HEARTS",
+         "code":"KH"},
+      {
+         "value":"ACE",
+         "suit":"SPADES",
+         "code":"AS"},
+      {
+         "value":"TWO",
+         "suit":"CLUBS",
+         "code":"2C"},
+      {
+         "value":"ACE",
+         "suit":"CLUBS",
+         "code":"AC"
+      }
+   ]
+}
+```
+
+</details>
+
+### Draw three cards
+```shell
+curl --request POST \
+  --url http://localhost:8080/deck/31ef40c2-5825-491c-b5c6-68e385717427/draw?count=3
+```
+
+<details>
+<summary>Example Output</summary>
+
+```json
+{
+   "cards": [
+      {
+         "value":"KING",
+         "suit":"DIAMONDS",
+         "code":"KD"
+      },
+      {
+         "value":"KING",
+         "suit":"HEARTS",
+         "code":"KH"
+      },
+      {
+         "value":"ACE",
+         "suit":"SPADES",
+         "code":"AS"
+      }
+   ]
+}
+```
+
+</details>
