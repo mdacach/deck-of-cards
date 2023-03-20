@@ -12,22 +12,16 @@ package main
 
 import (
 	"deck_of_cards/api"
-	"deck_of_cards/deck"
 	"fmt"
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
-	// TODO: Change this to (probably) Dependency Injection.
-	// Initialize the Deck Store that will be used by the endpoints.
-	// Note that the Store is concurrent.
-	api.DeckStore = deck.NewStore()
-
 	gin.SetMode(gin.ReleaseMode)
-	router := api.SetupRouter()
+	server := api.NewServer()
 
 	// TODO: Get port to run from flag/env variable
-	err := router.Run(":8080")
+	err := server.Run(":8080")
 	if err != nil {
 		// TODO: Better error handling.
 		fmt.Println("Could not start Gin server. Maybe port :8080 is already being used?")

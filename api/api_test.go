@@ -1,9 +1,7 @@
-package api_test
+package api
 
 import (
-	"deck_of_cards/api"
 	"deck_of_cards/card"
-	"deck_of_cards/deck"
 	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -26,7 +24,7 @@ func TestCreateDeckHandler(t *testing.T) {
 	assert.Equal(t, w.Code, http.StatusOK)
 
 	// Decode the response body.
-	var createdDeck api.CreateDeckResponse
+	var createdDeck CreateDeckResponse
 	err := json.NewDecoder(w.Body).Decode(&createdDeck)
 	assert.NoError(t, err)
 
@@ -46,7 +44,7 @@ func TestCreatePartialDeckEndpoint(t *testing.T) {
 
 	require.Equal(t, w.Code, http.StatusOK)
 
-	var createdDeck api.CreateDeckResponse
+	var createdDeck CreateDeckResponse
 	err := json.NewDecoder(w.Body).Decode(&createdDeck)
 	require.NoError(t, err)
 
@@ -102,7 +100,7 @@ func TestCreateStandardDeckShuffled(t *testing.T) {
 
 	assert.Equal(t, w.Code, http.StatusOK)
 
-	var resp api.CreateDeckResponse
+	var resp CreateDeckResponse
 	err := json.NewDecoder(w.Body).Decode(&resp)
 	assert.NoError(t, err)
 
@@ -124,7 +122,7 @@ func TestOpenDeck(t *testing.T) {
 
 	require.Equal(t, w.Code, http.StatusOK)
 
-	var createResponse api.CreateDeckResponse
+	var createResponse CreateDeckResponse
 	err := json.NewDecoder(w.Body).Decode(&createResponse)
 	require.NoError(t, err)
 
@@ -138,7 +136,7 @@ func TestOpenDeck(t *testing.T) {
 
 	assert.Equal(t, w.Code, http.StatusOK)
 
-	var openResponse api.OpenDeckResponse
+	var openResponse OpenDeckResponse
 	err = json.NewDecoder(w.Body).Decode(&openResponse)
 	require.NoError(t, err)
 
@@ -165,7 +163,7 @@ func TestOpenPartialDeck(t *testing.T) {
 
 	require.Equal(t, w.Code, http.StatusOK)
 
-	var createResponse api.CreateDeckResponse
+	var createResponse CreateDeckResponse
 	err := json.NewDecoder(w.Body).Decode(&createResponse)
 	require.NoError(t, err)
 
@@ -179,7 +177,7 @@ func TestOpenPartialDeck(t *testing.T) {
 
 	assert.Equal(t, w.Code, http.StatusOK)
 
-	var openResponse api.OpenDeckResponse
+	var openResponse OpenDeckResponse
 	err = json.NewDecoder(w.Body).Decode(&openResponse)
 	require.NoError(t, err)
 
@@ -268,7 +266,7 @@ func TestDrawPartialDeck(t *testing.T) {
 	router.ServeHTTP(w, req)
 	assert.Equal(t, http.StatusOK, w.Code)
 
-	var drawResponse api.DrawCardsResponse
+	var drawResponse DrawCardsResponse
 	err := json.NewDecoder(w.Body).Decode(&drawResponse)
 	assert.NoError(t, err)
 	drawnCards := drawResponse.Cards
@@ -308,7 +306,7 @@ func createTestDeck(router *gin.Engine, params string) uuid.UUID {
 	req, _ := http.NewRequest(http.MethodPost, "/deck/new"+params, nil)
 	router.ServeHTTP(w, req)
 
-	var createResponse api.CreateDeckResponse
+	var createResponse CreateDeckResponse
 	// This should never fail.
 	_ = json.Unmarshal(w.Body.Bytes(), &createResponse)
 
@@ -324,9 +322,7 @@ func setup() *gin.Engine {
 	// Lightweight mode for testing.
 	gin.SetMode(gin.TestMode)
 
-	// Set up the Gin router and Store.
-	router := api.SetupRouter()
-	api.DeckStore = deck.NewStore()
+	server := NewServer()
 
-	return router
+	return server.router
 }

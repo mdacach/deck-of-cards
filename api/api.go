@@ -14,20 +14,6 @@ import (
 	"strings"
 )
 
-var DeckStore *deck.Store
-
-// SetupRouter initializes the Gin router with the necessary routes for the card deck API.
-// It returns a pointer to the router, which can be used to start the HTTP server.
-func SetupRouter() *gin.Engine {
-	r := gin.Default()
-
-	r.POST("/deck/new", createDeckHandler)
-	r.GET("/deck/:deck_id", openDeckHandler)
-	r.POST("/deck/:deck_id/draw", drawCardHandler)
-
-	return r
-}
-
 // createDeckHandler is a Gin route handler for creating a new deck of cards.
 // It accepts optional query parameters "cards" and "shuffled" to create a custom deck and shuffle it, respectively.
 //
@@ -35,7 +21,7 @@ func SetupRouter() *gin.Engine {
 // /decks?cards=AS,KD,QH,2C,3S&shuffled=true
 //
 // The deck information is returned as JSON.
-func createDeckHandler(c *gin.Context) {
+func (server *Server) createDeckHandler(c *gin.Context) {
 	queryCards, exists := c.GetQuery("cards")
 	var createdDeck deck.Deck
 	var err error
@@ -58,7 +44,7 @@ func createDeckHandler(c *gin.Context) {
 		createdDeck.Shuffle()
 	}
 
-	err = DeckStore.Add(&createdDeck)
+	err = server.store.Add(&createdDeck)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, "")
 		return
@@ -81,13 +67,13 @@ type CreateDeckResponse struct {
 
 // openDeckHandler is a Gin route handler for retrieving an existing deck by its ID.
 // The deck ID is provided as a URL parameter. If the deck is found, the deck information is returned as JSON.
-func openDeckHandler(c *gin.Context) {
+func (server *Server) openDeckHandler(c *gin.Context) {
 	deckID, err := uuid.Parse(c.Param("deck_id"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Deck ID is not valid."})
 	}
 
-	deckRetrieved, notFound := DeckStore.Get(deckID)
+	deckRetrieved, notFound := server.store.Get(deckID)
 	if notFound != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Deck not found. Are you sure deck_id is correct?"})
 	}
@@ -112,7 +98,7 @@ type OpenDeckResponse struct {
 // drawCardHandler is a Gin route handler for drawing a specified number of cards from an existing deck.
 // The deck ID and card count are provided as URL parameters. If the deck is found and the draw is successful,
 // the drawn cards are returned as JSON.
-func drawCardHandler(c *gin.Context) {
+func (server *Server) drawCardHandler(c *gin.Context) {
 	deckID, err := uuid.Parse(c.Param("deck_id"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Deck ID is not valid."})
@@ -130,7 +116,7 @@ func drawCardHandler(c *gin.Context) {
 		return
 	}
 
-	deckRetrieved, notFound := DeckStore.Get(deckID)
+	deckRetrieved, notFound := server.store.Get(deckID)
 	if notFound != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Deck not found. Are you sure deck_id is correct?"})
 		return
