@@ -88,6 +88,9 @@ The package also defines the required request and response structures for each e
 
 ## Example Usage
 
+Note that the code here will not work on your machine because the uuid of your generated
+deck will be different. In order to follow along, you will need to update the deck_id between requests.
+
 ### Start the Server
 
 The server runs on port :8080.
@@ -277,13 +280,18 @@ make server
 
 ## Possible Improvements
 
+### Choose port to run
+
+Currently, the server always run on port :8080. We could add a flag or an environment variable to set
+which port to run.
+
 ### Data Persistence
 
 We store the decks in-memory, through a Map + Mutex.
-This means that if the server shuts down, every thing is lost.
+This means that if the server shuts down, every stored deck is lost.
 We could implement data persistence by using a database.
-A NoSQL database could be a good fit, as we won't need to perform
-SQL-like queries, and the data does not follow a table-like structure.
+A NoSQL database could be a good fit, as the data is not tabular and we won't need to perform
+complex queries.
 
 ### Require authorization for opening decks
 
@@ -296,11 +304,11 @@ For a bigger team, it would be nice to automatically reject a code change if tes
 
 ### Containerize
 
-We could make the project easier to run and develop by using Docker.
+We could make the project easier to run and develop by using container solutions such as Docker.
 
 ### Property-based testing
 
-Some of the tests (such as CardFromString) could be improved by
+Some tests (such as CardFromString) could be improved by
 using [Property-based testing](https://earthly.dev/blog/property-based-testing/).
 
 ### Idempotency of create
@@ -310,15 +318,17 @@ We would treat each request as different, and create multiple decks.
 
 ### Better error handling
 
-Error handling could be improved by providing custom error types.
+Error handling could be improved by providing custom error types and better error messages.
 
 ### Less memory usage
 
-In order to better mimic the JSON responses, we store all the cards individually inside a deck.
-The `deck` type contain an array of cards (with rank, suit and code). This is not necessary, because we only
-have 52 different types of cards, and they do not change internally. We could improve the memory usage by referring
-to the cards, instead of storing the cards. (e.g. store a []int inside Deck, where each integer corresponds to a card (
-from 1 to 52)).
+In order to better reflect the JSON responses, we store all the cards individually inside a deck.
+The `deck` type contain an array of cards (with rank, suit and code). This is not necessary, as we only
+have a fixed amount (52) different cards, and they do not change internally. We could improve the memory usage by
+referring
+to the cards, instead of storing the cards. (e.g. store a []int inside Deck, where each integer corresponds to a card by
+index
+(from 1 to 52)).
 
 ### Type-Driven Development
 
@@ -326,4 +336,4 @@ Let's consider `Rank` for example. Rank is a length-one string ("A" for Ace, "K"
 But there's no validation for creating a Rank. It is allowed to create a Rank("Some String"), and the compiler will not
 complain.
 [Newtype](https://www.reddit.com/r/golang/comments/kmj640/newtypes_constructing_and_validation/?utm_source=share&utm_medium=web2x&context=3)
-pattern could be useful for solving this problem.
+pattern could be useful for handling this.
