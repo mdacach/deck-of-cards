@@ -99,6 +99,14 @@ The server runs on port :8080.
 make server
 ```
 
+or
+
+```shell
+go run .
+```
+
+if no `make` available.
+
 1. ### Partial Shuffled Deck
    #### Create a partial shuffled Deck
    ```shell
@@ -299,6 +307,7 @@ Opening the deck exposes all the cards, in-order. If a user was able to inspect 
 they would know which cards to expect when drawing.
 
 ### Better logging
+
 Gin already provides some logging, but we are not logging anything else.
 
 ### Continuous Integration
