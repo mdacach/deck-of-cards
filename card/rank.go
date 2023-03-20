@@ -30,7 +30,6 @@ func Ranks() []Rank {
 }
 
 // IsValid checks whether the Rank is a valid value.
-// TODO: This will be refactored. The validation will happen in the Rank constructor.
 func (r Rank) IsValid() bool {
 	for _, validRank := range Ranks() {
 		if r == validRank {
@@ -70,7 +69,6 @@ func (r Rank) LongString() string {
 	case King:
 		return "KING"
 	default:
-		// TODO: Validate that Rank is always a valid variant (by construction).
 		return ""
 	}
 }

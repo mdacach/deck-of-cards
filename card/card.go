@@ -18,7 +18,6 @@ import (
 )
 
 // Card represents a single playing card with a rank and suit.
-// TODO: Use type-driven-development newtype pattern to make sure string card rank and suit is valid.
 type Card struct {
 	Rank Rank
 	Suit Suit
@@ -38,7 +37,6 @@ func FromString(s string) (Card, error) {
 
 	// Up until here, we do not know if the rank and suit are valid strings.
 	// So we need to validate them.
-	// TODO: This will change.
 	rank := Rank(rankStr)
 	suit := Suit(suitStr)
 

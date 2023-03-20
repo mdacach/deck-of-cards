@@ -21,7 +21,6 @@ func Suits() []Suit {
 }
 
 // IsValid checks whether the Suit is a valid value.
-// TODO: This will be refactored. The validation will happen in the Rank constructor.
 func (s Suit) IsValid() bool {
 	for _, validSuit := range Suits() {
 		if s == validSuit {
@@ -43,7 +42,6 @@ func (s Suit) LongString() string {
 	case Hearts:
 		return "HEARTS"
 	default:
-		// TODO: Validate that Suit is always a valid variant (by construction).
 		return ""
 	}
 }
